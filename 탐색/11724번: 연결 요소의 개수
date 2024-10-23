@@ -1,0 +1,64 @@
+** 핵심 ** 
+1. DFS에 대한 이해
+2. 인접 리스트와 방문 배열에 대한 이해
+3. 재귀 함수에 대한 이해
+
+-----------------------------------
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+static vector<vector<int>> stAdj;
+static vector<bool> stVisited;
+
+void DFS(int _iIndex)
+{
+    if (stVisited[_iIndex]) { return; }
+
+    stVisited[_iIndex] = true;
+
+    for (int i : stAdj[_iIndex])
+    {
+        if (!stVisited[i])
+        {
+            DFS(i);
+        }
+    }
+}
+
+int main() 
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int iNodeCount{ 0 }, iEdgeCount{ 0 };
+    std::cin >> iNodeCount >> iEdgeCount;
+
+    stAdj.resize(iNodeCount + 1);
+    stVisited.resize(iNodeCount + 1, false);
+
+    for (int i = 0; i < iEdgeCount; i++)
+    {
+        int iNodeA{ 0 }, iNodeB{ 0 };
+        std::cin >> iNodeA >> iNodeB;
+
+        stAdj[iNodeA].push_back(iNodeB);
+        stAdj[iNodeB].push_back(iNodeA);
+    }
+
+    int iCount{ 0 };
+    for (int i = 1; i < iNodeCount + 1; i++)
+    {
+        if (!stVisited[i])
+        {
+            ++iCount;
+            DFS(i);
+        }
+    }
+
+    std::cout << iCount;
+
+    return 0;
+}
