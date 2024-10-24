@@ -1,0 +1,96 @@
+** 핵심 **
+1. BFS에 대한 이해
+2. DFS는 재귀 함수를 통해 구현되고, BFS는 queue와 while문을 통해 구현된다.
+3. 방문할 노드가 여러개일 경우 정렬을 통해 번호가 작은 것 부터 방문하도록 한다.
+
+-------------------------------------------------------------------------
+
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <queue>
+using namespace std;
+
+static vector<vector<int>> stAdj;
+static vector<bool> stVisited;
+void DFS(int _iNode);
+void BFS(int _iNode);
+
+int main() 
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int iNodeCnt{ 0 }, iEdgeCnt{ 0 }, iStartNode{ 0 };
+    std::cin >> iNodeCnt >> iEdgeCnt >> iStartNode;
+
+    stAdj.resize(iNodeCnt + 1);
+    stVisited.resize(iNodeCnt + 1, false);
+
+    for (int i = 1; i < iEdgeCnt + 1; i++)
+    {
+        int iNodeA{ 0 }, iNodeB{ 0 };
+        std::cin >> iNodeA >> iNodeB;
+
+        stAdj[iNodeA].push_back(iNodeB);
+        stAdj[iNodeB].push_back(iNodeA);
+    }
+
+    for (int i = 1; i <= iNodeCnt; i++)
+    {
+        std::sort(stAdj[i].begin(), stAdj[i].end());
+    }
+
+    DFS(iStartNode);
+
+    std::cout << "\n";
+    
+    for (int i = 1; i < stVisited.size(); i++)
+    {
+        stVisited[i] = false;
+    }
+
+    BFS(iStartNode);
+
+    return 0;
+}
+
+void DFS(int _iNode)
+{
+    std::cout << _iNode << ' ';
+    stVisited[_iNode] = true;
+
+    for (int i : stAdj[_iNode])
+    {
+        if (!stVisited[i])
+        {
+            DFS(i);
+        }
+    }
+}
+
+void BFS(int _iNode)
+{
+    std::queue<int> qSearchingSequence;
+    qSearchingSequence.push(_iNode);
+    stVisited[_iNode] = true;
+
+    while (!qSearchingSequence.empty())
+    {
+        int iCurNode = qSearchingSequence.front();
+        qSearchingSequence.pop();
+
+        std::cout << iCurNode << ' ';
+        
+        for (int i : stAdj[iCurNode])
+        {
+            if (!stVisited[i])
+            {
+                stVisited[i] = true;
+                qSearchingSequence.push(i);
+            }
+        }
+
+    }
+}
