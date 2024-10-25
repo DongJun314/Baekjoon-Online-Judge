@@ -1,0 +1,49 @@
+** 핵심 **
+1. 소수는 제곱근까지만 수행해도 된다
+2. 배수 지우기 위한 for문 체크
+
+---------------------------------
+
+#include <iostream>
+#include <vector>
+#include <cmath>
+using namespace std;
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int iStartPrime{ 0 }, iEndPrime{ 0 };
+    std::cin >> iStartPrime >> iEndPrime;
+
+    std::vector<int> vecPrimes(iEndPrime + 1);
+
+    for (int i = 2; i <= iEndPrime + 1; i++)
+    {
+        vecPrimes[i] = i;
+    }
+
+    for (int iX = 2; iX <= sqrt(iEndPrime); iX++)
+    {
+        if (vecPrimes[iX] == 0)
+        {
+            continue;
+        }
+        for (int iY = iX + iX; iY <= iEndPrime; iY = iY + iX)
+        {
+            vecPrimes[iY] = 0;
+        }
+    }
+
+    for (int i = iStartPrime; i <= iEndPrime; i++)
+    {
+        if (vecPrimes[i] != 0)
+        {
+            std::cout << vecPrimes[i] << "\n";
+        }
+    }
+
+    return 0;
+}
