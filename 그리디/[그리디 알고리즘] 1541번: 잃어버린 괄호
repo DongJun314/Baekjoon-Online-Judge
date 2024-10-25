@@ -1,0 +1,72 @@
+** 핵심 **
+1. 최솟값을 만들기 위해서는 더하기 연산을 한 다음 빼기 연산을 수행해야한다
+2. 문자열을 짜르고 붙일 때, stringstream을 사용하자
+
+---------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream> 
+using namespace std;
+
+vector<string> Split(string _strString, char _szOperator);
+int Sum(string _strString);
+
+int main() 
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    std::string strExpre;
+    std::cin >> strExpre;
+
+    std::vector<string> strSplitMinus = Split(strExpre, '-');
+    int iAnswer{ 0 };
+
+    for (int i = 0; i < strSplitMinus.size(); i++)
+    {
+        int iSum = Sum(strSplitMinus[i]);
+
+        if (i == 0)
+        {
+            iAnswer = iAnswer + iSum;
+        }
+        else
+        {
+            iAnswer = iAnswer - iSum;
+        }
+    }
+
+    std::cout << iAnswer;
+
+    return 0;
+}
+
+vector<string> Split(string _strString, char _szOperator)
+{
+    std::vector<string> vecResult;
+    std::stringstream strStream(_strString);
+    std::string strSplitString;
+
+    while (std::getline(strStream, strSplitString, _szOperator))
+    {
+        vecResult.push_back(strSplitString);
+    }
+
+    return vecResult;
+}
+
+int Sum(string _strString)
+{
+    int iSum{ 0 };
+    std::vector<string> vecStrNum = Split(_strString, '+');
+
+    for (int i = 0; i < vecStrNum.size(); i++)
+    {
+        iSum += std::stoi(vecStrNum[i]);
+    }
+
+    return iSum;
+}
