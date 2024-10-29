@@ -1,0 +1,103 @@
+** 핵심 **
+1. cin은 빈공간을 기준으로 입력이 된다.
+2. 임의의 노드에서 가장 긴 경로로 연결된 노드는 트리의 지름에 해당하는 두 노드 중 하나다.
+3. 이걸 바탕으로 최장 거리를 계산한다.
+
+----------------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+struct Node 
+{
+    int iNode{ 0 };
+    int iWeight{ 0 };
+};
+
+static vector<vector<Node>> stVecNodeAdjList;
+static vector<int> stVecDistance;
+static vector<bool> stVecVisited;
+int stiNodeCnt{ 0 };
+
+void BFS(int _iStartNode);
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    std::cin >> stiNodeCnt;
+
+    stVecNodeAdjList.resize(stiNodeCnt + 1);
+    stVecDistance.resize(stiNodeCnt + 1, 0);
+    stVecVisited.resize(stiNodeCnt + 1, false);
+
+    for (int i = 1; i <= stiNodeCnt; i++)
+    {
+        int iStartNode{ 0 };
+        std::cin >> iStartNode;
+
+        while (true)
+        {
+            int iEndNode{ 0 }, iWeight{ 0 };
+            std::cin >> iEndNode;
+
+            if (iEndNode == -1) { break; }
+
+            std::cin >> iWeight;
+
+            stVecNodeAdjList[iStartNode].push_back(Node{ iEndNode, iWeight });
+        }
+    }
+
+    BFS(1);
+
+    int iMax{ 1 };
+
+    for (int i = 2; i <= stiNodeCnt; i++)
+    {
+        if (stVecDistance[iMax] < stVecDistance[i])
+        {
+            iMax = i;
+        }
+    }
+
+    fill(stVecVisited.begin(), stVecVisited.end(), false);
+    fill(stVecDistance.begin(), stVecDistance.end(), 0);
+
+    BFS(iMax);
+
+    sort(stVecDistance.begin(), stVecDistance.end());
+
+    std::cout << stVecDistance[stiNodeCnt];
+    
+    return 0;
+}
+
+void BFS(int _iStartNode)
+{
+    std::queue<int> qNode;
+    qNode.push(_iStartNode);
+    stVecVisited[_iStartNode] = true;
+
+    while (!qNode.empty())
+    {
+        int iNode = qNode.front();
+        qNode.pop();
+
+        for (Node tNode : stVecNodeAdjList[iNode])
+        {
+            if (!stVecVisited[tNode.iNode])
+            {
+                stVecVisited[tNode.iNode] = true;
+                qNode.push(tNode.iNode);
+
+                stVecDistance[tNode.iNode] = stVecDistance[iNode] + tNode.iWeight;
+            }
+        }
+    }
+}
