@@ -1,0 +1,70 @@
+** 핵심 **
+1. 깊이 값을 추가하는 법에 대해서 알기
+2. DFS에 대한 이해
+3. 깊이가 왜 5면 프로그램을 종료하는지에 대한 이해
+
+----------------------------------------------
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+static int stiNodeCnt{ 0 }, stiEdgeCnt{ 0 };
+static bool stbIsArrived{ false };
+static vector<int> stVecVisited;
+static vector<vector<int>> stVecEdge;
+
+void DFS(int _iStartNode, int _iDepth);
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+    
+    std::cin >> stiNodeCnt >> stiEdgeCnt;
+
+    stVecEdge.resize(stiNodeCnt);
+    stVecVisited.resize(stiNodeCnt, false);
+
+    for (int i = 0; i < stiEdgeCnt; i++)
+    {
+        int iNodeA{ 0 }, iNodeB{ 0 };
+        std::cin >> iNodeA >> iNodeB;
+
+        stVecEdge[iNodeA].push_back(iNodeB);
+        stVecEdge[iNodeB].push_back(iNodeA);    
+    }
+
+    for (int i = 0; i < stiNodeCnt; i++)
+    {
+        DFS(i, 1);
+
+        if (stbIsArrived) { break; }
+    }
+
+    if (stbIsArrived) { std::cout << 1; }
+    else { std::cout << 0; }
+
+    return 0;
+}
+
+void DFS(int _iStartNode, int _iDepth)
+{
+    if (_iDepth == 5 || stbIsArrived)
+    {
+        stbIsArrived = true;
+        return;
+    }
+
+    stVecVisited[_iStartNode] = true;
+
+    for (int iNode : stVecEdge[_iStartNode])
+    {
+        if (!stVecVisited[iNode])
+        {
+            DFS(iNode, _iDepth + 1);
+        }
+    }
+    stVecVisited[_iStartNode] = false;
+}
