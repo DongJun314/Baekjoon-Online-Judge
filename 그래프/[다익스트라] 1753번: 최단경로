@@ -1,0 +1,89 @@
+** 핵심 **
+1. 다익스트라 알고리즘에 대한 이해
+2. 다익스트라 알고리즘은 최단 거리 노드를 우선 탐색해야 한다, 그래서 무조건 priority_queue를 사용해야한다.
+3. priority_queue를 사용할 경우, 크기를 비교해야하는데, 구조체 같은 경우 오버로딩을 해줘야한다, 그게 싫으면 pair를 사용하면 된다.
+
+--------------------------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+struct Edge
+{
+    int tNode{ 0 };
+    int tWeight{ 0 };
+
+    bool operator>(const Edge& other) const {
+        return tWeight > other.tWeight; // 가중치 기준으로 비교 (최소 힙)
+    }
+};
+
+static int stiNodeCnt{ 0 }, stiEdgeCnt{ 0 }, stiStartNode{ 0 };
+
+static vector<int> stVecDis;
+static vector<bool> stVecVisited;
+static vector<vector<Edge>> stVecNodeList;
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    std::cin >> stiNodeCnt >> stiEdgeCnt >> stiStartNode;
+
+    stVecDis.resize(stiNodeCnt + 1, INT_MAX);
+    stVecVisited.resize(stiNodeCnt + 1, false);
+    stVecNodeList.resize(stiNodeCnt + 1);
+
+    for (int i = 0; i < stiEdgeCnt; i++) 
+    {
+        int iStartIndex{ 0 }, iEndIndex{ 0 }, iWeight{ 0 };
+        std::cin >> iStartIndex >> iEndIndex >> iWeight;
+        stVecNodeList[iStartIndex].push_back(Edge{ iEndIndex, iWeight });
+    }
+    
+    std::priority_queue<Edge, vector<Edge>, greater<Edge>> qEdge;
+    qEdge.push(Edge{ stiStartNode, 0 });
+    stVecDis[stiStartNode] = 0;
+
+    while (!qEdge.empty())
+    {
+        Edge tCurEdge = qEdge.top();
+        qEdge.pop();
+
+        int iCurNode = tCurEdge.tNode;
+
+        if (stVecVisited[iCurNode]) { continue; }
+
+        stVecVisited[iCurNode] = true;
+
+        for (Edge tEdge : stVecNodeList[iCurNode])
+        {
+            int iNextNode = tEdge.tNode;
+            int iWeight = tEdge.tWeight;
+
+            if (stVecDis[iNextNode] > stVecDis[iCurNode] + iWeight)
+            {
+                stVecDis[iNextNode] = stVecDis[iCurNode] + iWeight;
+                qEdge.push(Edge{ iNextNode, stVecDis[iNextNode] });
+            }
+        }
+    }
+
+    for (int i = 1; i <= stiNodeCnt; i++)
+    {
+        if (stVecVisited[i])
+        {
+            std::cout << stVecDis[i] << "\n";
+        }
+        else
+        {
+            std::cout << "INF" << "\n";
+        }
+    }
+
+    return 0;
+}
