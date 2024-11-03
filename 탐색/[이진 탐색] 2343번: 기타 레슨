@@ -1,0 +1,71 @@
+** 핵심 **
+1. 이진 탐색에 대한 이해
+2. 일반적인 이진 트리의 코드 형식에 대한 이해
+3. 블루레이의 최소 크기와 최대 크기를 계산 후 그것을 토대로 사이즈 조절
+ 
+------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+static int stiLessonCnt{ 0 }, stiBlueRayCnt{ 0 };
+static vector<int> stVecLessons;
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+    
+    std::cin >> stiLessonCnt >> stiBlueRayCnt;
+
+    stVecLessons.resize(stiLessonCnt);
+
+    int iStart{ 0 }, iEnd{ 0 };
+
+    for (int i = 0; i < stiLessonCnt; i++)
+    {
+        std::cin >> stVecLessons[i];
+        
+        if (iStart < stVecLessons[i])
+        {
+            iStart = stVecLessons[i];
+        }
+        iEnd += stVecLessons[i];
+    }
+
+    while (iStart <= iEnd)
+    {
+        int iMid = (iStart + iEnd) / 2;
+        int iSum{ 0 }, iBlueRayCnt{ 0 };
+
+        for (int i = 0; i < stiLessonCnt; i++)
+        {
+            if (iSum + stVecLessons[i] > iMid)
+            {
+                iBlueRayCnt++;
+                iSum = 0;
+            }
+            iSum += stVecLessons[i];
+        }
+
+        if (iSum != 0)
+        {
+            iBlueRayCnt++;
+        }
+
+        if (iBlueRayCnt > stiBlueRayCnt) 
+        {
+            iStart = iMid + 1;
+        }
+        else 
+        {
+            iEnd = iMid - 1;
+        }
+    }
+
+    std::cout << iStart;
+
+    return 0;
+}
