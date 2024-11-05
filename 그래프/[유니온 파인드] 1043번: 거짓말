@@ -1,0 +1,107 @@
+** 핵심 **
+1. 여러 집단 중에 속해 있는지 없는지에 대한 판단은 유니온 파인드를 통해 찾기
+2. Union 함수는 내부적으로 Find 함수를 사용할 것
+
+**********************************************************************
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+static vector<int> stVecKnowTrue;
+static vector<int> stVecParent;
+static vector<vector<int>> stVecPartys;
+
+void Union(int _iNodeA, int _iNodeB);
+int Find(int _iNode);
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int iPeopleCnt{ 0 }, iPartyCnt{ 0 }, iKnowTrueCnt{ 0 };
+    std::cin >> iPeopleCnt >> iPartyCnt >> iKnowTrueCnt;
+    
+    stVecKnowTrue.resize(iKnowTrueCnt);
+    for (int i = 0; i < iKnowTrueCnt; i++)
+    {
+        std::cin >> stVecKnowTrue[i];
+    }
+
+    stVecPartys.resize(iPartyCnt);
+    for (int iX = 0; iX < iPartyCnt; iX++)
+    {
+        int iPartySize{ 0 };
+        std::cin >> iPartySize;
+
+        for (int iY = 0; iY < iPartySize; iY++)
+        {
+            int iPeople{ 0 };
+            std::cin >> iPeople;
+            stVecPartys[iX].push_back(iPeople);
+        }
+    }
+
+    stVecParent.resize(iPeopleCnt + 1);
+    for (int i = 0; i <= iPeopleCnt; i++)
+    {
+        stVecParent[i] = i;
+    }
+
+    for (int iX = 0; iX < iPartyCnt; iX++)
+    {
+        int iFirstPeople = stVecPartys[iX][0];
+        for (int iY = 1; iY < stVecPartys[iX].size(); iY++)
+        {
+            Union(iFirstPeople, stVecPartys[iX][iY]);
+        }
+    }
+
+    int iResult{ 0 };
+    for (int iX = 0; iX < iPartyCnt; iX++)
+    {
+        bool bIsPossible{ true };
+        int iCur = stVecPartys[iX][0];
+        for (int iY = 0; iY < iKnowTrueCnt; iY++)
+        {
+            if (Find(iCur) == Find(stVecKnowTrue[iY]))
+            {
+                bIsPossible = false;
+                break;
+            }
+        }
+
+        if(bIsPossible)
+        {
+            iResult++;
+        }
+    }
+
+    std::cout << iResult;
+
+    return 0;
+}
+
+void Union(int _iNodeA, int _iNodeB)
+{
+    _iNodeA = Find(_iNodeA);
+    _iNodeB = Find(_iNodeB);
+
+    if (_iNodeA != _iNodeB)
+    {
+        stVecParent[_iNodeB] = _iNodeA;
+    }
+}
+
+int Find(int _iNode)
+{
+    if (stVecParent[_iNode] == _iNode)
+    {
+        return _iNode;
+    }
+    else
+    {
+        return stVecParent[_iNode] = Find(stVecParent[_iNode]);
+    }
+}
