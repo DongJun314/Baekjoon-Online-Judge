@@ -1,0 +1,77 @@
+** 핵심 **
+1. 유니온 파인드의 기본 union과 find 함수의 동작 원리에 대한 이해
+2. union 함수는 재귀가 아니고, find 함수는 재귀로 동작
+
+-------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+static vector<int> stVecArr;
+
+void Union(int _iNodeA, int _iNodeB);
+int Find(int _iNode);
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int iElementCnt{ 0 }, iQuestionCnt{ 0 };
+    std::cin >> iElementCnt >> iQuestionCnt;
+
+    stVecArr.resize(iElementCnt + 1);
+
+    for (int i = 0; i <= iElementCnt; i++)
+    {
+        stVecArr[i] = i;
+    }
+
+    for (int i = 0; i < iQuestionCnt; i++)
+    {
+        int iWay{ 0 }, iNodeA{ 0 }, iNodeB{ 0 };
+        std::cin >> iWay >> iNodeA >> iNodeB;
+
+        if (iWay == 0) // union
+        {
+            Union(iNodeA, iNodeB);
+        }
+        else // find
+        {
+            if (Find(iNodeA) == Find(iNodeB))
+            {
+                std::cout << "YES" << "\n";
+            }
+            else
+            {
+                std::cout << "NO" << "\n";
+            }
+        }
+    }
+
+    return 0;
+}
+
+void Union(int _iNodeA, int _iNodeB)
+{
+    _iNodeA = Find(_iNodeA);
+    _iNodeB = Find(_iNodeB);
+
+    if (_iNodeA != _iNodeB)
+    {
+        stVecArr[_iNodeB] = _iNodeA;
+    }
+}
+
+int Find(int _iNode)
+{
+    if (stVecArr[_iNode] == _iNode)
+    {
+        return _iNode;
+    }
+    else
+    {
+        return stVecArr[_iNode] = Find(stVecArr[_iNode]);
+    }
+}
