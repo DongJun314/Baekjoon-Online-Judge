@@ -1,0 +1,102 @@
+** 핵심 **
+1. 유니온 파인드를 문제에서 읽고 파악하기
+2. 연결 여부를 파악하는 문제가 나올 경우 유니온 파인드를 생각하기
+
+------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+
+static vector<int> stVecParent;
+static vector<int> stVecScheduleCity;
+static vector<vector<int>> stVecAdjList;
+
+void Union(int _iNodeA, int _iNodeB);
+int Find(int _iNode);
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int iCityCnt{ 0 }, iScheduleCityCnt{ 0 };
+    std::cin >> iCityCnt >> iScheduleCityCnt;
+
+    stVecAdjList.resize(iCityCnt + 1, vector<int>(iCityCnt + 1, -1));
+    stVecScheduleCity.resize(iScheduleCityCnt + 1, 0);
+    stVecParent.resize(iCityCnt + 1, 0);
+
+    for (int iX = 1; iX <= iCityCnt ; iX++) // 연결 정보
+    {
+        for (int iY = 1; iY <= iCityCnt ; iY++)
+        {
+            std::cin >> stVecAdjList[iX][iY];
+        }
+    }
+    
+    for (int i = 1; i <= iScheduleCityCnt; i++) // 여행 루트
+    {
+        std::cin >> stVecScheduleCity[i];
+    }
+
+    for (int i = 0; i <= iCityCnt; i++) // 대표 노드 정보
+    {
+        stVecParent[i] = i;
+    }
+
+    for (int iX = 1; iX <= iCityCnt; iX++) // 연결 정보
+    {
+        for (int iY = 1; iY <= iCityCnt; iY++)
+        {
+            if (stVecAdjList[iX][iY] == 1)
+            {
+                Union(iX, iY);
+            }
+        }
+    }
+
+    int iNodeA = Find(stVecScheduleCity[1]);
+    bool bIsSame{ true };
+
+    for (int i = 2; i <= iScheduleCityCnt; i++) // 여행 루트
+    {
+        if (iNodeA != Find(stVecScheduleCity[i]))
+        {
+            std::cout << "NO" << "\n";
+            bIsSame = false;
+            break;
+        }
+    }
+    
+    if (bIsSame)
+    {
+        std::cout << "YES" << "\n";
+    }
+
+    return 0;
+}
+
+void Union(int _iNodeA, int _iNodeB)
+{
+    _iNodeA = Find(_iNodeA);
+    _iNodeB = Find(_iNodeB);
+
+    if (_iNodeA != _iNodeB)
+    {
+        stVecParent[_iNodeB] = _iNodeA;
+    }
+}
+
+int Find(int _iNode)
+{
+    if (stVecParent[_iNode] == _iNode)
+    {
+        return _iNode;
+    }
+    else
+    {
+        return stVecParent[_iNode] = Find(stVecParent[_iNode]);
+    }
+}
