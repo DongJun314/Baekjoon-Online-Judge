@@ -1,0 +1,43 @@
+** 핵심 **
+1. 이진탐색에 대한 이해
+2. 이 문제의 핵심은 작은 수의 개수를 세는 아이디어다.
+
+-------------------------------------------------
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int iN{ 0 }, iK{ 0 };
+    std::cin >> iN >> iK;
+
+    int iStart{ 0 }, iEnd{ iK }, iResult{ 0 };
+    while (iStart <= iEnd)
+    {
+        int iMid = (iStart + iEnd) / 2;
+
+        int iCnt{ 0 };
+        for (int i = 1; i <= iN; i++)
+        {
+            iCnt += min(iMid/i, iN);
+        }
+
+        if (iCnt < iK)
+        {
+            iStart = iMid + 1;
+        }
+        else
+        {
+            iEnd = iMid - 1;
+            iResult = iMid;
+        }
+    }
+
+    std::cout << iResult;
+
+    return 0;
+}
