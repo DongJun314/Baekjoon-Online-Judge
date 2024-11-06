@@ -1,0 +1,112 @@
+** 핵심 ** 
+1. 인덱스 놀이
+2. 2차원 배열에 겹을 1차원 배열에 넣은 후 회전한 뒤, 그것을 다시 2차원 배열에 집어 넣기
+3. 회전 값은 항상 나머지 연산으로 최적화를 해야함 -> 길이가 5인데, 6번 회전하면 사실상 1번만 회전한거랑 값이 같기 때문에
+
+---------------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+static int stiRowSize{ 0 }, stiColumnSize{ 0 }, stiRotateCnt{ 0 };
+static vector<vector<int>> stVecArr;
+
+void RotateLayer(int _iLayer, int _iRotateCnt);
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    std::cin >> stiRowSize >> stiColumnSize >> stiRotateCnt;
+
+    // 행렬 입력 받기
+    stVecArr.resize(stiRowSize, vector<int>(stiColumnSize));
+    for (int iRow = 0; iRow < stiRowSize; iRow++)
+    {
+        for (int iColumn = 0; iColumn < stiColumnSize; iColumn++)
+        {
+            std::cin >> stVecArr[iRow][iColumn];
+        }
+    }
+    
+    // 겹별로 회전시키기
+    int iLayerCnt = min(stiRowSize, stiColumnSize) / 2; // 최대 겹의 개수 구하기
+    for (int iLayer = 0; iLayer < iLayerCnt; iLayer++)
+    {
+        RotateLayer(iLayer, stiRotateCnt);
+    }
+
+    // 행렬 출력하기
+    for (int iRow = 0; iRow < stiRowSize; iRow++)
+    {
+        for (int iColumn = 0; iColumn < stiColumnSize; iColumn++)
+        {
+            std::cout << stVecArr[iRow][iColumn] << ' ';
+        }
+        std::cout << "\n";
+    }
+
+    return 0;
+}
+
+void RotateLayer(int _iLayer, int _iRotateCnt)
+{
+    // 2차원 배열의 겹을 -> 1차원 배열에 집어넣기
+    vector<int> vecLayer;
+    int iLayerRowEnd = stiRowSize - _iLayer - 1;
+    int iLayerColumnEnd = stiColumnSize - _iLayer - 1;
+
+    // 윗부분
+    for (int iUp = _iLayer; iUp < iLayerColumnEnd; iUp++) 
+    {
+        vecLayer.push_back(stVecArr[_iLayer][iUp]);
+    }
+    // 오른쪽 부분
+    for (int iRight = _iLayer; iRight < iLayerRowEnd; iRight++)  
+    {
+        vecLayer.push_back(stVecArr[iRight][iLayerColumnEnd]);
+    }
+    // 아랫부분
+    for (int iDown = iLayerColumnEnd; iDown > _iLayer; iDown--) 
+    {
+        vecLayer.push_back(stVecArr[iLayerRowEnd][iDown]);
+    }
+    // 왼쪽 부분
+    for (int iLeft = iLayerRowEnd; iLeft > _iLayer; iLeft--)  
+    {
+        vecLayer.push_back(stVecArr[iLeft][_iLayer]);
+    }
+
+    // 회전수 최적화
+    int iLayerLength = vecLayer.size();
+    int iRotateCnt = _iRotateCnt % iLayerLength;
+
+    // 회전과 동시에 1차원 배열 -> 2차원 배열에 집어넣기
+    int iIndex = iRotateCnt;
+    // 윗부분
+    for (int iUp = _iLayer; iUp < iLayerColumnEnd; iUp++)  // iLayerColumnEnd는 끝을 포함하지 않음
+    {
+        stVecArr[_iLayer][iUp] = vecLayer[iIndex];
+        iIndex = (iIndex + 1) % iLayerLength;
+    }
+    // 오른쪽 부분
+    for (int iRight = _iLayer; iRight < iLayerRowEnd; iRight++)  // iLayerRowEnd는 끝을 포함하지 않음
+    {
+        stVecArr[iRight][iLayerColumnEnd] = vecLayer[iIndex];
+        iIndex = (iIndex + 1) % iLayerLength;
+    }
+    // 아랫부분
+    for (int iDown = iLayerColumnEnd; iDown > _iLayer; iDown--)  // iLayerColumnEnd는 끝을 포함하지 않음
+    {
+        stVecArr[iLayerRowEnd][iDown] = vecLayer[iIndex];
+        iIndex = (iIndex + 1) % iLayerLength;
+    }
+    // 왼쪽 부분
+    for (int iLeft = iLayerRowEnd; iLeft > _iLayer; iLeft--)  // iLayerRowEnd는 끝을 포함하지 않음
+    {
+        stVecArr[iLeft][_iLayer] = vecLayer[iIndex];
+        iIndex = (iIndex + 1) % iLayerLength;
+    }
+}
