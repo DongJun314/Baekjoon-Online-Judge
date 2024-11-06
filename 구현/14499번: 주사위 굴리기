@@ -1,0 +1,130 @@
+** 핵심 ** 
+1. 굴리는 방향에 따른 인덱스 변환, 그리고 주사위에 값 업데이트
+
+---------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+static int iMapRowSize{ 0 }, iMapColumnSize{ 0 }, iDicePosX{ 0 }, iDicePosY{ 0 }, iCommandCnt{ 0 };
+static vector<vector<int>> stVecMap; // {위, 아래, 앞, 뒤, 왼쪽, 오른쪽}
+static vector<int> stVecDice;
+
+int Judgement(int _iDir);
+void RollingDice(int _iDir);
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    std::cin >> iMapRowSize >> iMapColumnSize >> iDicePosX >> iDicePosY >> iCommandCnt;
+
+    stVecMap.resize(iMapRowSize, vector<int>(iMapColumnSize, 0));
+    for (int iRow = 0; iRow < iMapRowSize; iRow++)
+    {
+        for (int iColumn = 0; iColumn < iMapColumnSize; iColumn++)
+        {
+            std::cin >> stVecMap[iRow][iColumn];    
+        }
+    }
+
+    stVecDice.resize(6, 0); 
+    for (int i = 0; i < iCommandCnt; i++)
+    {
+        int iCommand{ 0 };
+        std::cin >> iCommand;
+
+        if (Judgement(iCommand)) { continue; }
+
+        RollingDice(iCommand);
+
+        std::cout << stVecDice[0] << "\n";
+    }
+
+    return 0;
+}
+
+int Judgement(int _iDir)
+{
+    if (_iDir == 1) // 동쪽
+    { 
+        if (iDicePosY + 1 < iMapColumnSize) 
+        {
+            iDicePosY += 1;
+            return 0;
+        }
+    }
+    else if (_iDir == 2) // 서쪽
+    { 
+        if (iDicePosY - 1 >= 0) 
+        {
+            iDicePosY -= 1;
+            return 0;
+        }
+    }
+    else if (_iDir == 3) // 북쪽
+    { 
+        if (iDicePosX - 1 >= 0) 
+        {
+            iDicePosX -= 1;
+            return 0;
+        }
+    }
+    else if (_iDir == 4) // 남쪽
+    { 
+        if (iDicePosX + 1 < iMapRowSize) 
+        {
+            iDicePosX += 1;
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+void RollingDice(int _iDir)
+{
+    stVecDice; // {위(0), 아래(1), 앞(2), 뒤(3), 왼쪽(4), 오른쪽(5)}
+
+    int iDiceNum = stVecDice[0];
+    if (1 == _iDir) // 동
+    {
+        stVecDice[0] = stVecDice[4];
+        stVecDice[4] = stVecDice[1];
+        stVecDice[1] = stVecDice[5];
+        stVecDice[5] = iDiceNum;
+    }
+    else if (2 == _iDir) // 서
+    {
+        stVecDice[0] = stVecDice[5];
+        stVecDice[5] = stVecDice[1];
+        stVecDice[1] = stVecDice[4];
+        stVecDice[4] = iDiceNum;
+    }
+    else if (3 == _iDir) // 북
+    {
+        stVecDice[0] = stVecDice[3];
+        stVecDice[3] = stVecDice[1];
+        stVecDice[1] = stVecDice[2];
+        stVecDice[2] = iDiceNum;
+    }
+    else if (4 == _iDir) // 남
+    {
+        stVecDice[0] = stVecDice[2];
+        stVecDice[2] = stVecDice[1];
+        stVecDice[1] = stVecDice[3];
+        stVecDice[3] = iDiceNum;
+    }
+
+    if (stVecMap[iDicePosX][iDicePosY] == 0) 
+    {
+        stVecMap[iDicePosX][iDicePosY] = stVecDice[1];
+    }
+    else 
+    {
+        stVecDice[1] = stVecMap[iDicePosX][iDicePosY];
+        stVecMap[iDicePosX][iDicePosY] = 0;
+    }
+}
