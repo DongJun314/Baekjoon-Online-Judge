@@ -1,0 +1,36 @@
+** 핵심 ** 
+1. 여기서 구간합의 개수를 구하기 위해서는 투 포인터를 =0으로 최기화 후, End 포인터를 조절하면 값을 더하고, Start 포인터를 조절하며 값을 뺀다.
+2. 반복문 안에 end <= n 즉, 한번 더 순회를 한 이유는 sum을 더하고 한번 더 if(sum == m) 이 조건을 확인하기 위함이다
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+
+using namespace std;
+
+int n, m;
+int arr[10001];
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+
+    cin >> n >> m;
+    for (int i = 0; i < n; i++) cin >> arr[i];
+    int ans = 0, sum = 0;
+    int start = 0, end = 0;
+    while (end <= n) {
+        if (sum == m) {
+            ans++;
+            sum -= arr[start++];
+        }
+        else if (sum > m) {
+            sum -= arr[start++];
+        }
+        else {
+            sum += arr[end++];
+        }
+    }
+    cout << ans << '\n';
+}
