@@ -1,0 +1,46 @@
+** 핵심 ** 
+1. 투포인터 알고리즘
+2. 일반적인 투포인터, 더하고, 합이 제일 작은 인덱스 길이를 반환
+
+-------------------
+
+#include <iostream>
+#include <vector>
+
+using namespace std;
+#define INF 2e9
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n, s;
+    cin >> n >> s;
+    vector <int> v(n, 0);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> v[i];
+    }
+    int left = 0;
+    int right = 0;
+    int sum = 0;
+    int ans = INF;
+    while (left <= right)
+    {
+        if (sum >= s)
+        {
+            ans = min(ans, right - left);   
+            sum -= v[left];
+            left++;
+        }
+        else if (right == n) break;
+        else
+        {
+            sum += v[right];
+            right++;
+        }
+    }
+    if (ans == INF) cout << 0;
+    else cout << ans;
+}
