@@ -1,0 +1,44 @@
+** 핵심 ** 
+1. 백트래킹과 재귀에 대한 이해
+2. 중복 조합에 대한 이해, 중복을 막기 위해서 bool visited[1001] 이런 방식으로 중복 체크
+
+----------------------------------------------------------------------------------
+
+#include <iostream>
+using namespace std;
+
+#define I 1
+#define V 5
+#define X 10
+#define L 50
+
+int N;
+int answer = 0;
+bool visited[1001] = {0};  // 합이 중복되었는지 확인하는 배열
+int iArr[4] = {I, V, X, L};
+
+// 작은 문제를 해결하는 함수 (Top-Down)
+void pickDFS(int toPick, int start, int sum) {
+    // 작은 문제 (Base Case): 더 이상 고를 숫자가 없을 때
+    if (toPick == 0) {
+        // 중복된 숫자 조합이 아닌 경우에만 카운트
+        if (!visited[sum]) {
+            visited[sum] = true;
+            answer++;
+        }
+        return;
+    }
+    
+    // 큰 문제를 작은 문제로 나눠가는 반복
+    for (int i = start; i < 4; i++) {
+        pickDFS(toPick - 1, i, sum + iArr[i]);
+    }
+}
+
+int main() {
+    cin >> N;
+    // Top-Down 방식으로 문제 해결 시작
+    pickDFS(N, 0, 0);
+    cout << answer << endl;
+    return 0;
+}
