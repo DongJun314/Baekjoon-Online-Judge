@@ -1,0 +1,66 @@
+** 핵심 **
+1. 문제를 보면 깊이 우선 탐색인지 알아야 한다
+2. 깊이 값을 증가하면서, 풀어야한다
+
+-----------------------------------------
+
+#include<iostream>
+#define endl "\n"
+using namespace std;
+
+int Map[5][5], iAns = 0;
+bool bVisit[1000000];
+
+int dx[] = { 0,0,1,-1 };
+int dy[] = { 1,-1,0,0 };
+
+void DFS(int x, int y, int Sum, int Cnt)
+{
+	if (Cnt == 5)
+	{
+		if (bVisit[Sum] == false)
+		{
+			bVisit[Sum] = true;
+			iAns++;
+		}
+		return;
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		int nx = x + dx[i];
+		int ny = y + dy[i];
+
+		if (nx >= 0 && ny >= 0 && nx < 5 && ny < 5)
+		{
+			DFS(nx, ny, Sum * 10 + Map[nx][ny], Cnt + 1);
+		}
+	}
+}
+
+int main(void)
+{
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	cout.tie(nullptr);
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			cin >> Map[i][j];
+		}
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			DFS(i, j, Map[i][j], 0);
+		}
+	}
+
+	cout << iAns << endl;
+
+	return 0;
+}
