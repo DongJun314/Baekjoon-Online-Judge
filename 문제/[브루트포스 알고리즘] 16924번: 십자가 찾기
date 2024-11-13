@@ -1,0 +1,113 @@
+** 핵심 **
+1. 브루트포스
+2. 구현
+
+-------------------
+
+#include <iostream>
+#include <vector>
+#include <tuple>
+using namespace std;
+
+static int iRowSize{ 0 }, iColumnSize{ 0 };
+static vector<vector<char>> vecBoard;
+static vector<tuple<int, int, int>> vecCrossInfo;
+
+int FindMaxCrossSize(int _iRow, int _iColumn)
+{
+    int iSize{ 0 };
+
+    while (true)
+    {
+        int iUp = _iRow - (iSize + 1);
+        int iDown = _iRow + (iSize + 1);
+        int iLeft = _iColumn - (iSize + 1);
+        int iRight = _iColumn + (iSize + 1);
+
+        if (iUp < 0 || iDown >= iRowSize || iLeft < 0 || iRight >= iColumnSize)
+        {
+            break;
+        }
+
+        if (vecBoard[iUp][_iColumn] != '*' || vecBoard[iDown][_iColumn] != '*' || vecBoard[_iRow][iLeft]  != '*' || vecBoard[_iRow][iRight] != '*') 
+        {
+            break;
+        }
+
+        iSize++;
+    }
+
+    return iSize;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iRowSize >> iColumnSize;
+
+    // 초기 격자판 세팅 
+    vecBoard.resize(iRowSize, vector<char>(iColumnSize));
+
+    for (int iRow = 0; iRow < iRowSize; iRow++)
+    {
+        for (int iColumn = 0; iColumn < iColumnSize; iColumn++)
+        {
+            cin >> vecBoard[iRow][iColumn];
+        }
+    }
+
+    vector<vector<char>> vecNewBoard = vecBoard;
+
+    for (int iRow = 0; iRow < iRowSize; iRow++)
+    {
+        for (int iColumn = 0; iColumn < iColumnSize; iColumn++)
+        {
+            if (vecBoard[iRow][iColumn] == '*')
+            {
+                int iMaxSize = FindMaxCrossSize(iRow, iColumn);
+
+                if (iMaxSize > 0)
+                {
+                    vecCrossInfo.push_back(make_tuple(iRow + 1, iColumn + 1, iMaxSize));
+                
+                    // 십자가 그린 부분을 '.'로 마킹 (이미 확인한 부분)
+                    vecNewBoard[iRow][iColumn] = '.';
+                    for (int i = 1; i <= iMaxSize; i++) {
+                        vecNewBoard[iRow - i][iColumn] = '.';
+                        vecNewBoard[iRow + i][iColumn] = '.';
+                        vecNewBoard[iRow][iColumn - i] = '.';
+                        vecNewBoard[iRow][iColumn + i] = '.';
+                    }
+                }
+            }
+        }
+    }
+
+    bool bIsValid{ true };
+    for (int iRow = 0; iRow < iRowSize; iRow++) {
+        for (int iColumn = 0; iColumn < iColumnSize; iColumn++) {
+            if (vecNewBoard[iRow][iColumn] == '*') {
+                bIsValid = false;
+                break;
+            }
+        }
+    }
+
+    if (!vecCrossInfo.empty() && bIsValid)
+    {
+        cout << vecCrossInfo.size() << "\n";
+
+        for (int i = 0; i < vecCrossInfo.size(); i++)
+        {
+            cout << get<0>(vecCrossInfo[i]) << ' ' << get<1>(vecCrossInfo[i]) << ' ' << get<2>(vecCrossInfo[i]) << ' ' << "\n";
+        }
+    }
+    else
+    {
+        cout << -1;
+    }
+
+    return 0;
+}
