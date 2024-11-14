@@ -1,0 +1,89 @@
+** 핵심 **
+1. 스티커를 겹치지 않기에, 只需要分析长和宽即可
+2. 두 스티커만 고려한다
+
+--------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+static int iPaperHeight{ 0 }, iPaperWidth{ 0 }, iStickerCnt{ 0 }, iMaxAreaSize{ 0 };
+static vector<pair<int, int>> vecStickers;
+
+bool CanPlaceSticker(pair<int, int> _prStickerA, pair<int, int> _prStickerB)
+{
+    int iHeightA = _prStickerA.first;
+    int iWidthA  = _prStickerA.second;
+    int iHeightB = _prStickerB.first;
+    int iWidthB  = _prStickerB.second;
+
+    // 가로로 나란히 배치
+    if (iHeightA <= iPaperHeight && 
+        iHeightB <= iPaperHeight &&
+        iWidthA + iWidthB <= iPaperWidth)
+    {
+        return true;
+    }
+
+    // 세로로 나란히 배치
+    if (iWidthA <= iPaperWidth &&
+        iWidthB <= iPaperWidth &&
+        iHeightA + iHeightB <= iPaperHeight)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void StickerRotationState(int _iStickerA, int _iStickerB)
+{
+    for (int iStateA = 0; iStateA < 2; iStateA++)
+    {
+        for (int iStateB = 0; iStateB < 2; iStateB++)
+        {
+            if (iStateA == 1) { swap(vecStickers[_iStickerA].first, vecStickers[_iStickerA].second); }
+            if (iStateB == 1) { swap(vecStickers[_iStickerB].first, vecStickers[_iStickerB].second); }
+
+            if (CanPlaceSticker(vecStickers[_iStickerA], vecStickers[_iStickerB]))
+            {
+                int iCurAreaSize = (vecStickers[_iStickerA].first * vecStickers[_iStickerA].second)
+                                 + (vecStickers[_iStickerB].first * vecStickers[_iStickerB].second);
+                iMaxAreaSize = max(iCurAreaSize, iMaxAreaSize);
+            }
+
+            // 원래대로 복구
+            if (iStateA == 1) swap(vecStickers[_iStickerA].first, vecStickers[_iStickerA].second);
+            if (iStateB == 1) swap(vecStickers[_iStickerB].first, vecStickers[_iStickerB].second);
+        }
+    }
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iPaperHeight >> iPaperWidth >> iStickerCnt;
+
+    vecStickers.resize(iStickerCnt);
+
+    for (int i = 0; i < iStickerCnt; i++)
+    {
+        cin >> vecStickers[i].first >> vecStickers[i].second;
+    }
+
+    for (int iStickerA = 0; iStickerA < iStickerCnt; iStickerA++)
+    {
+        for (int iStickerB = iStickerA + 1; iStickerB < iStickerCnt; iStickerB++)
+        {
+            StickerRotationState(iStickerA, iStickerB);
+        }
+    }
+    
+    cout << iMaxAreaSize;
+
+    return 0;
+}
