@@ -1,0 +1,50 @@
+** 핵심 **
+1. 이 문제의 핵심은 DFS에 매개 변수에 최대값과 최소값을 추가해주고,
+2. 거기에 iDepth가 특정 숫자이기보다는, 2보다 크기만하면 되기에 해당 조건을 추가해준다
+
+--------------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+static int iProblemCnt{ 0 }, iMinSum{ 0 }, iMaxSum{ 0 }, iMinDiff{ 0 }, iAns{ 0 };
+static vector<int> vecDiffs;
+
+void DFS(int _iIndex, int _iSum, int _iDepth, int _iMax, int _iMin)
+{
+    if (_iDepth >= 2)
+    {
+        if (_iSum >= iMinSum && _iSum <= iMaxSum && (_iMax - _iMin) >= iMinDiff)
+        {
+            iAns++;
+        }
+    }
+
+    for (int i = _iIndex; i < iProblemCnt; i++)
+    {
+        DFS(i + 1, _iSum + vecDiffs[i], _iDepth + 1, max(_iMax, vecDiffs[i]), min(_iMin, vecDiffs[i]));
+    }
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iProblemCnt >> iMinSum >> iMaxSum >> iMinDiff;
+
+    vecDiffs.resize(iProblemCnt);
+
+    for (int i = 0; i < iProblemCnt; i++)
+    {
+        cin >> vecDiffs[i];
+    }
+
+    DFS(0, 0, 0, 0, 1000000);
+
+    cout << iAns;
+
+    return 0;
+}
