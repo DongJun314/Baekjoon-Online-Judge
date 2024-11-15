@@ -1,1 +1,69 @@
+** 핵심 **
+1. 단어에 개수에 따른 계산 (45행, 51행)
 
+----------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+static string strNumA{}, strNumB{}, strNumC{"-1"};
+static vector<bool> vecVisited;
+
+void FindMaxNum(string _strCur)
+{
+    if (_strCur.length() == strNumA.length())
+    {
+        if (_strCur < strNumB)
+        {
+            strNumC = max(strNumC, _strCur);
+        }
+        return;
+    }
+
+    for (int i = 0; i < strNumA.length(); i++)
+    {
+        if (vecVisited[i]) { continue; }
+        if (_strCur.empty() && strNumA[i] == '0') { continue; }
+
+        vecVisited[i] = true;
+        FindMaxNum(_strCur + strNumA[i]);
+        vecVisited[i] = false;
+    }
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> strNumA >> strNumB;
+
+    vecVisited.resize(strNumA.length(), false);
+
+    if (strNumA.length() > strNumB.length())
+    {
+        cout << -1 << '\n';
+        return 0;
+    }
+
+    sort(strNumA.begin(), strNumA.end(), greater<char>());
+
+    if (strNumA.length() == strNumB.length())
+    {
+        FindMaxNum("");
+    }
+    else
+    {
+        if (strNumA[0] != '0')
+        {
+            cout << strNumA << '\n';
+            return 0;
+        }
+    }
+
+    cout << strNumC << '\n';
+
+    return 0;
+}
