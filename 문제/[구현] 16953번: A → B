@@ -1,0 +1,43 @@
+** 핵심 **
+1. 단순 구현
+2. 순서는 거꾸로 해보기
+
+---------------------
+
+#include <iostream>
+using namespace std;
+
+int iA{ 0 }, iB{ 0 }, iCnt{ 1 };
+
+int main() 
+{
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iA >> iB;
+
+    while (true)
+    {
+        if (iA == iB) { break; }
+        else if (iA > iB) { iCnt = -1; break; }
+
+        if (iB % 2 == 0)
+        {
+            iB /= 2;
+        }
+        else if (iB % 10 == 1)
+        {
+            iB = (iB - 1) / 10;
+        }
+        else
+        {
+            iCnt = -1;
+            break;
+        }
+        iCnt++;
+    }
+
+    cout << iCnt;
+
+    return 0;
+}
