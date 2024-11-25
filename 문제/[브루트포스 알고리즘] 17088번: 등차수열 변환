@@ -1,0 +1,80 @@
+** 핵심 **
+1. 첫번째 두번째의 숫자를 변형 후, 등차수열을 만드는 과정에서 경우의 수를 배제하며 최소값 찾기
+
+---------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+#define MAX 987654321
+
+int iSqnCnt{ 0 }, iMinCnt{ MAX };
+vector<int> vecSqn;  // 입력 수열
+
+// 수정된 수열로부터 최소 연산 횟수를 계산
+int GetMinOperations(int _iFirst, int _iSecond) 
+{
+    int iDiff = _iFirst - _iSecond; // 공차 계산
+    int iCurValue = _iSecond;      // 현재 값
+    int iOperCnt = 0;
+
+    if (vecSqn.size() > 1) 
+    {
+        // 첫 번째와 두 번째 값이 수정되었는지 확인
+        iOperCnt += (vecSqn[0] != _iFirst) + (vecSqn[1] != _iSecond);
+    }
+
+    // 나머지 값 계산 및 검증
+    for (int i = 2; i < iSqnCnt; i++) 
+    {
+        iCurValue += iDiff; // 예상 값
+        if (abs(iCurValue - vecSqn[i]) > 1)
+        {
+            return MAX; // 불가능한 경우
+        }
+        iOperCnt += (iCurValue != vecSqn[i]);
+    }
+
+    return iOperCnt;
+}
+
+int main() 
+{
+    cin >> iSqnCnt;
+    vecSqn.resize(iSqnCnt);
+
+    for (int i = 0; i < iSqnCnt; i++) 
+    {
+        cin >> vecSqn[i];
+    }
+
+    if (iSqnCnt == 1) 
+    {
+        cout << 0; // 수열이 1개면 등차수열
+        return 0;
+    }
+
+    // 첫 번째와 두 번째 값을 변경해 모든 조합 탐색
+    for (int iFstOper : {-1, 0, 1}) 
+    {
+        for (int iSecOper : {-1, 0, 1}) 
+        {
+            int iFirst = vecSqn[0] + iFstOper;
+            int iSecond = vecSqn[1] + iSecOper;
+            iMinCnt = min(iMinCnt, GetMinOperations(iFirst, iSecond));
+        }
+    }
+
+    if (iMinCnt == MAX) 
+    {
+        cout << -1; // 불가능한 경우
+    }
+    else 
+    {
+        cout << iMinCnt; // 최소 연산 횟수
+    }
+
+    return 0;
+}
