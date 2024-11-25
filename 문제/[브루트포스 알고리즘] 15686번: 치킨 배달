@@ -1,0 +1,79 @@
+** 핵심 **
+1. 백트래킹, 치킨집의 회수
+
+----------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+const int INF = 987654321;
+typedef pair<int, int> POS;
+
+int iCitySize{ 0 }, iChckResCnt{ 0 }, iMinDis{ INF };
+vector<POS> vecHouse;              
+vector<POS> vecChickHouse;          
+vector<int> vecSelectedChickens;    
+
+int CalculateChickenDistance() 
+{
+    int iTotalDist{ 0 };
+
+    for (auto& iHouse : vecHouse) 
+    {
+        int iMinDist = INF;
+        for (int i : vecSelectedChickens) 
+        {
+            int iDist = abs(iHouse.first - vecChickHouse[i].first) + abs(iHouse.second - vecChickHouse[i].second);
+            iMinDist = min(iMinDist, iDist);
+        }
+        iTotalDist += iMinDist;
+    }
+    return iTotalDist;
+}
+
+void SelectChickenHouses(int _iStart, int _iCnt) 
+{
+    if (_iCnt == iChckResCnt)
+    {
+        int currentDistance = CalculateChickenDistance();
+        iMinDis = min(iMinDis, currentDistance);
+        return;
+    }
+
+    for (int i = _iStart; i < vecChickHouse.size(); ++i)
+    {
+        vecSelectedChickens.push_back(i);
+        SelectChickenHouses(i + 1, _iCnt + 1);
+        vecSelectedChickens.pop_back();
+    }
+}
+
+int main() 
+{
+    cin >> iCitySize >> iChckResCnt;
+    vector<vector<int>> vecCityMap(iCitySize, vector<int>(iCitySize));
+
+    for (int i = 0; i < iCitySize; ++i) 
+    {
+        for (int j = 0; j < iCitySize; ++j) 
+        {
+            cin >> vecCityMap[i][j];
+
+            if (vecCityMap[i][j] == 1) 
+            {
+                vecHouse.push_back({ i, j }); 
+            }
+            else if (vecCityMap[i][j] == 2) 
+            {
+                vecChickHouse.push_back({ i, j });
+            }
+        }
+    }
+
+    SelectChickenHouses(0, 0); 
+    cout << iMinDis;
+
+    return 0;
+}
