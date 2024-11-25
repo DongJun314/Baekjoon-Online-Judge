@@ -1,0 +1,64 @@
+** 핵심 ** 
+1. 방향에 따른 row, col를 더하며 위치에 대한 처리하기
+
+---------------------------------------------------
+
+#include<iostream>
+using namespace std;
+
+int iMap[5][5], iAns{ 0 };
+bool bVisit[1000000];
+
+int iDirRow[] = { 0,0,1,-1 };
+int iDirCol[] = { 1,-1,0,0 };
+
+void DFS(int _iRow, int _iCol, int _iSum, int _iCnt)
+{
+	if (_iCnt == 5)
+	{
+		if (bVisit[_iSum] == false)
+		{
+			bVisit[_iSum] = true;
+			iAns++;
+		}
+		return;
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		int iNextRow = _iRow + iDirRow[i];
+		int iNextCol = _iCol + iDirCol[i];
+
+		if (iNextRow >= 0 && iNextCol >= 0 && iNextRow < 5 && iNextCol < 5)
+		{
+			DFS(iNextRow, iNextCol, _iSum * 10 + iMap[iNextRow][iNextCol], _iCnt + 1);
+		}
+	}
+}
+
+int main(void)
+{
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	cout.tie(nullptr);
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			cin >> iMap[i][j];
+		}
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			DFS(i, j, iMap[i][j], 0);
+		}
+	}
+
+	cout << iAns;
+
+	return 0;
+}
