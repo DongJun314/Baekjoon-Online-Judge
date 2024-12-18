@@ -1,0 +1,35 @@
+** 핵심 ** 
+1. 뒤에 나오는 공백 부분까지 출력할 필요가 없다.
+
+--------------------
+
+#include <iostream>
+using namespace std;
+
+int main(void) 
+{
+	int iN{ 0 };
+	cin >> iN; 
+
+	for (int iRow = 1; iRow <= iN; iRow++)
+	{
+		for (int iCol = 0; iCol < iN - iRow; iCol++)
+			cout << ' ';
+		for (int iCol = 0; iCol < iRow + (iRow - 1); iCol++) 
+			cout << '*';
+
+		cout << '\n';
+	}
+
+	for (int iRow = iN - 1; iRow > 0; iRow--)
+	{
+		for (int iCol = 0; iCol < iN - iRow; iCol++)
+			cout << ' ';
+		for (int iCol = 0; iCol < iRow + (iRow - 1); iCol++)
+			cout << '*';
+
+		cout << '\n';
+	}
+
+	return 0;
+}
