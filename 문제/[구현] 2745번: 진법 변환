@@ -1,0 +1,28 @@
+** 핵심 **
+1. 이 문제의 핵심은 진법 변환 공식
+2. 누적해서 진법 변환하는 공식
+
+---------------------------------
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	string iN; int iB;
+	cin >> iN >> iB;
+
+	int iResult{ 0 };
+	for (int i = 0; i < iN.length(); i++)
+	{
+		if ('0' <= iN[i] && iN[i] <= '9') { iResult = iResult * iB + (iN[i] - '0'); }
+		else { iResult = iResult * iB + (iN[i] - 'A' + 10); }
+	}
+
+	cout << iResult;
+
+	return 0;
+}
