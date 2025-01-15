@@ -1,0 +1,49 @@
+** 핵심 **
+1. 브루트 포스를 응용한 또 다른 방법
+
+---------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+bool bIsFound{ false };
+vector<int> vecNine;
+vector<int> vecSeven;
+
+void DFS(int _iIndex, int _iCnt, int _iSum) {
+	if (_iCnt == 7) {
+		if (_iSum == 100) {
+			for (int i = 0; i < 7; i++) {
+				cout << vecSeven[i] << '\n';
+			}	
+			bIsFound = true;
+		}
+	}
+
+	if (_iIndex > 8 || bIsFound)
+		return;
+
+	vecSeven.push_back(vecNine[_iIndex]);
+	DFS(_iIndex + 1, _iCnt + 1, _iSum + vecNine[_iIndex]);
+	vecSeven.pop_back();
+
+	DFS(_iIndex + 1, _iCnt, _iSum);
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	vecNine.resize(9, 0);
+	
+	for (int i = 0; i < 9; i++) {
+		cin >> vecNine[i];
+	}
+
+	sort(vecNine.begin(), vecNine.end());
+	DFS(0, 0, 0);
+
+	return 0;
+}
