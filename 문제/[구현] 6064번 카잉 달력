@@ -1,0 +1,42 @@
+** 핵심 ** 
+1. 핵심은 1씩 추가하는 방식이 아닌, 각 주기에 맞게 끔 주기를 더해주고, 서로 같을때 종료하기
+
+-------------------------------------------------------------------------------------
+
+#include <iostream>
+using namespace std;
+
+int iN{ 0 };
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	cin >> iN;
+
+	for (int i = 0; i < iN; i++)
+	{
+		int iM{ 0 }, iN{ 0 }, iX{ 0 }, iY{ 0 }, iYear{ 0 };
+		cin >> iM >> iN >> iX >> iY;
+
+		while (true) {
+			if (iX == iY) {
+				cout << iX << '\n';
+				break;
+			}
+			else if (iX > iM * iN) {
+				cout << -1 << '\n';
+				break;
+			}
+
+			if (iX < iY) {
+				iX += iM;
+			}
+			else {
+				iY += iN;
+			}
+		}
+	}
+	
+	return 0;
+}
