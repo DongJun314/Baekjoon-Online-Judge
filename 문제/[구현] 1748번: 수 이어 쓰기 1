@@ -1,0 +1,22 @@
+** 핵심 ** 
+1. 핵심은 수를 1에 자리 수, 10 자리 수, 100 자리 수로 나눠 구현한다
+
+----------------------------------------------------------------
+
+#include <iostream>
+using namespace std;
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	int iNum, iRes = 0;
+	cin >> iNum;
+
+	for (int i = 1; i <= iNum; i *= 10) {
+		iRes += iNum - i + 1;
+	}
+
+	cout << iRes;
+	return 0;
+}
