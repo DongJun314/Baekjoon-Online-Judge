@@ -1,0 +1,79 @@
+** 핵심 ** 
+1. 함수화, 카운팅 방법
+
+---------------------
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+int iN{ 0 }, iMax{ 0 };
+vector<string> vecBoard;
+
+int CountMaxCandy() {
+	int iMaxCandy{ 0 };
+
+	for (int iRow = 0; iRow < iN; iRow++)
+	{
+		int iRowCnt{ 1 }, iColCnt{ 1 };
+
+		for (int iCol = 1; iCol < iN; iCol++)
+		{
+			if (vecBoard[iRow][iCol] == vecBoard[iRow][iCol - 1]) {
+				++iColCnt;
+			}
+			else {
+				iColCnt = 1;
+			}
+			iMaxCandy = max(iMaxCandy, iColCnt);
+
+			if (vecBoard[iCol][iRow] == vecBoard[iCol - 1][iRow]) {
+				++iRowCnt;
+			}
+			else {
+				iRowCnt = 1;
+			}
+			iMaxCandy = max(iMaxCandy, iRowCnt);
+		}
+	}
+
+	return iMaxCandy;
+}
+
+void TrySwapAndCount(int _iRowA, int _iColA, int _iRowB, int _iColB) {
+	swap(vecBoard[_iRowA][_iColA], vecBoard[_iRowB][_iColB]);
+	iMax = max(iMax, CountMaxCandy());
+	swap(vecBoard[_iRowA][_iColA], vecBoard[_iRowB][_iColB]);
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+
+	cin >> iN;
+
+	vecBoard.resize(iN);
+
+	for (int i = 0; i < iN; i++)
+		cin >> vecBoard[i];
+	
+	for (int iRow = 0; iRow < iN; iRow++)
+	{
+		for (int iCol = 0; iCol < iN; iCol++)
+		{
+			if (iRow + 1 < iN) {
+				TrySwapAndCount(iRow, iCol, iRow + 1, iCol);
+			}
+			if (iCol + 1 < iN) {
+				TrySwapAndCount(iRow, iCol, iRow, iCol + 1);
+			}
+		}
+	}
+
+	cout << iMax;
+
+	return 0;
+}
