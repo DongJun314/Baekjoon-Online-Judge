@@ -1,0 +1,80 @@
+** 핵심 **
+1. 이 문제는 두가지 방법이 있다
+2. 첫 번째는 모든 모양을 나열하고, 그거에 대한 에외처리; 두 번째는 DFS를 통한 탐색(단, T자 모양은 따로 처리해줘야한다)
+
+--------------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int iN{ 0 }, iM{ 0 }, iMaxValue{ 0 };
+vector<int> vecRows{ -1,1,0,0 };  // 상하좌우
+vector<int> vecCols{ 0,0,-1, 1 }; // 상하좌우
+vector<vector<int>> vecPaper;
+vector<vector<bool>> vecValid;
+
+void DFS(int _iRow, int _iCol, int _iDepth, int _iMax) {
+	if (_iDepth == 4) {
+		iMaxValue = max(iMaxValue, _iMax);
+		return;
+	}
+
+	for (int iDir = 0; iDir < 4; iDir++) // 상하좌우
+	{
+		int iRow = _iRow + vecRows[iDir];
+		int iCol = _iCol + vecCols[iDir];
+
+		if (iRow < 0 || iRow >= iN || iCol < 0 || iCol >= iM)
+			continue;
+
+		if (vecValid[iRow][iCol])
+			continue;
+
+		vecValid[iRow][iCol] = true;
+		DFS(iRow, iCol, _iDepth + 1, _iMax + vecPaper[iRow][iCol]);
+		vecValid[iRow][iCol] = false;
+	}
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	cin >> iN >> iM;
+
+	vecPaper.resize(iN, vector<int>(iM, 0));
+	vecValid.resize(iN, vector<bool>(iM, false));
+
+	for (int iRow = 0; iRow < iN; iRow++)
+	{
+		for (int iCol = 0; iCol < iM; iCol++)
+		{
+			cin >> vecPaper[iRow][iCol];
+		}
+	}
+
+	for (int iRow = 0; iRow < iN; iRow++)
+	{
+		for (int iCol = 0; iCol < iM; iCol++)
+		{
+			vecValid[iRow][iCol] = true;
+			DFS(iRow, iCol, 1, vecPaper[iRow][iCol]);
+			vecValid[iRow][iCol] = false;
+
+			if (iRow - 1 >= 0 && iCol - 1 >= 0 && iCol + 1 < iM) // ㅗ
+				iMaxValue = max(iMaxValue, vecPaper[iRow][iCol] + vecPaper[iRow - 1][iCol] + vecPaper[iRow][iCol - 1] + vecPaper[iRow][iCol + 1]);
+			if (iRow + 1 < iN && iCol - 1 >= 0 && iCol + 1 < iM) // ㅜ
+				iMaxValue = max(iMaxValue, vecPaper[iRow][iCol] + vecPaper[iRow + 1][iCol] + vecPaper[iRow][iCol - 1] + vecPaper[iRow][iCol + 1]);
+			if (iRow - 1 >= 0 && iRow + 1 < iN && iCol - 1 >= 0) // ㅓ
+				iMaxValue = max(iMaxValue, vecPaper[iRow][iCol] + vecPaper[iRow - 1][iCol] + vecPaper[iRow + 1][iCol] + vecPaper[iRow][iCol - 1]);
+			if (iRow - 1 >= 0 && iRow + 1 < iN && iCol + 1 < iM) // ㅏ
+				iMaxValue = max(iMaxValue, vecPaper[iRow][iCol] + vecPaper[iRow - 1][iCol] + vecPaper[iRow + 1][iCol] + vecPaper[iRow][iCol + 1]);
+		}
+	}
+	
+	cout << iMaxValue;
+
+	return 0;
+}
