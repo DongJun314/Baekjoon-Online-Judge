@@ -1,0 +1,104 @@
+** 핵심 **
+1. 이 문제는 두가지 방법이 있다
+2. 첫 번째는 모든 모양을 나열하고, 그거에 대한 에외처리; 두 번째는 DFS를 통한 탐색(단, T자 모양은 따로 처리해줘야한다)
+
+--------------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int iN{ 0 }, iM{ 0 };
+vector<vector<int>> vecPaper;
+vector<vector<pair<int, int>>> vecTetrominoes = {
+	// 직선 모양(I)
+	{{0,0}, {0,1}, {0,2}, {0,3}},    // 가로
+	{{0,0}, {1,0}, {2,0}, {3,0}},    // 세로
+
+	// 정사각형 모양(O)
+	{{0,0}, {0,1}, {1,0}, {1,1}},    // 정사각형
+
+	// T자 모양(T)
+	{{0,0}, {0,1}, {0,2}, {1,1}},    // 위쪽
+	{{0,0}, {1,0}, {2,0}, {1,1}},    // 오른쪽
+	{{0,0}, {1,-1}, {1,0}, {1,1}},   // 아래쪽
+	{{0,0}, {1,-1}, {1,0}, {2,0}},   // 왼쪽
+
+	// L자 모양 (L)
+	{{0,0}, {1,0}, {2,0}, {2,1}},    // 세로, 오른쪽 아래
+	{{0,0}, {1,0}, {2,0}, {2,-1}},   // 세로, 왼쪽 아래
+	{{0,0}, {0,1}, {0,2}, {1,0}},    // 가로, 아래로 꺾임
+	{{0,0}, {0,1}, {0,2}, {-1,2}},   // 가로, 위로 꺾임
+	{{0,0}, {1,0}, {2,0}, {2,-1}},   // 세로, 왼쪽 아래 (대칭)
+	{{0,0}, {1,0}, {2,0}, {2,1}},    // 세로, 오른쪽 아래 (대칭)
+	{{0,0}, {0,-1}, {0,-2}, {1,-2}}, // 가로, 아래로 꺾임 (대칭)
+	{{0,0}, {0,-1}, {0,-2}, {-1,-2}},// 가로, 위로 꺾임 (대칭)
+
+	// Z자 모양(Z)
+	{{0,0}, {0,1}, {1,1}, {1,2}},    // 기본 Z (오른쪽 대각선)
+	{{0,0}, {1,0}, {1,-1}, {2,-1}},  // 기본 Z (왼쪽 대각선)
+	{{0,0}, {0,-1}, {1,-1}, {1,-2}}, // 대칭 Z (왼쪽 대각선)
+	{{0,0}, {1,0}, {1,1}, {2,1}},    // 대칭 Z (오른쪽 대각선)
+};
+
+int FindMaxValue(int _iRow, int _iCol) {
+
+	int iMax{ -1 };
+
+	for (int iX = 0; iX < vecTetrominoes.size(); iX++)
+	{
+		int iNum{ 0 };
+		bool bIsValid{ true };
+
+		for (int iY = 0; iY < 4; iY++)
+		{
+			int iRow = _iRow + vecTetrominoes[iX][iY].first;
+			int iCol = _iCol + vecTetrominoes[iX][iY].second;
+
+			if (iRow < 0 || iRow >= iN || iCol < 0 || iCol >= iM) {
+				bIsValid = false;
+				break;
+			}
+			
+			iNum += vecPaper[iRow][iCol];
+		}
+
+		if (bIsValid) {
+			iMax = max(iMax, iNum);
+		}
+	}
+
+	return iMax;
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	cin >> iN >> iM;
+
+	vecPaper.resize(iN, vector<int>(iM, 0));
+
+	for (int iRow = 0; iRow < iN; iRow++)
+	{
+		for (int iCol = 0; iCol < iM; iCol++)
+		{
+			cin >> vecPaper[iRow][iCol];
+		}
+	}
+
+	int iMax{ 0 };
+	for (int iRow = 0; iRow < iN; iRow++)
+	{
+		for (int iCol = 0; iCol < iM; iCol++)
+		{
+			int iNum = FindMaxValue(iRow, iCol);
+			iMax = max(iMax, iNum);
+		}
+	}
+
+	cout << iMax;
+
+	return 0;
+}
