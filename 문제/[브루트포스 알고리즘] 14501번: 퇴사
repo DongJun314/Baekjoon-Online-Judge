@@ -1,0 +1,50 @@
+** 주의사항 **
+1. 만약에 인덱스를 0부터 시작이 아니라면, 그것을 잘 주의해서, 코드에서 작성하기
+2. 이 문제는 일반적인 DFS로 품
+
+-------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int iN{ 0 }, iMaxPay{ 0 };
+vector<pair<int, int>> vecSchedual;
+
+void DFS(int _iIndex, int _iPay) {
+	if (_iIndex >= iN + 1) {
+		iMaxPay = max(iMaxPay, _iPay);
+		return;
+	}
+
+	int iTime = vecSchedual[_iIndex].first;
+	int iPay = vecSchedual[_iIndex].second;
+
+	if (_iIndex + iTime <= iN + 1) {
+		DFS(_iIndex + iTime, _iPay + iPay);
+	} 
+
+	DFS(_iIndex + 1, _iPay);
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	cin >> iN;
+	vecSchedual.resize(iN + 1);
+
+	for (int i = 1; i <= iN; i++)
+	{
+		int iTime{ 0 }, iPay{ 0 };
+		cin >> iTime >> iPay;
+		vecSchedual[i] = { iTime, iPay };
+	}
+
+	DFS(1, 0);
+
+	cout << iMaxPay;
+
+	return 0;
+}
