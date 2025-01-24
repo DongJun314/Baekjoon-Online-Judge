@@ -1,0 +1,67 @@
+** 핵심 ** 
+1. 포문 안에서 DFS 돌리기
+2. 부등호에 따라서 조건을 나누고, DFS 돌리기
+
+---------------------------------------------------------------
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int iK{ 0 };
+string strSymbol;
+string strMaxValue{ "" }, strMinValue{ "987654321" };
+vector<bool> vecIsValid;
+
+void DFS(int _iNum, string _strSum) {
+	if (_strSum.length() == iK + 1) {
+		strMaxValue = max(strMaxValue, _strSum);
+		strMinValue = min(strMinValue, _strSum);
+		return;
+	}
+
+	for (int iNum = 0; iNum < 10; iNum++)
+	{
+		if (vecIsValid[iNum])
+			continue;
+
+		int iSymbol = _strSum.length() - 1;
+		if (strSymbol[iSymbol] == '<' && _iNum > iNum)
+			continue;
+		if (strSymbol[iSymbol] == '>' && _iNum < iNum)
+			continue;
+
+		vecIsValid[iNum] = true;
+		DFS(iNum, _strSum + to_string(iNum));
+		vecIsValid[iNum] = false;
+	}
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	cin >> iK;
+	vecIsValid.resize(10, false);
+
+	for (int i = 0; i < iK; i++)
+	{
+		char szChar;
+		cin >> szChar;
+		strSymbol += szChar;
+	}
+
+	for (int iNum = 0; iNum < 10; iNum++)
+	{
+		vecIsValid[iNum] = true;
+		DFS(iNum, to_string(iNum));
+		vecIsValid[iNum] = false;
+	}
+
+	cout << strMaxValue << '\n';
+	cout << strMinValue << '\n';
+
+	return 0;
+}
