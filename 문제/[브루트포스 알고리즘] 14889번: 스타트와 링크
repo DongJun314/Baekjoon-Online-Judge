@@ -1,0 +1,68 @@
+** 핵심 **
+1. 이 문제의 디테일은 true false로 두 팀을 나누는 것이다.
+2. 즉, 팀의 합을 먼저 구하는 것이 아닌, 우선 DFS로 팀을 나눈 다음, 탈출 DFS 탈출 조건에서 팀의 합을 구한 후, 최소값을 갱신하는 로직
+
+---------------------------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int iN{ 0 }, iMinValue{ INT_MAX };
+vector<vector<int>> vecBoard;
+vector<bool> vecIsValid;
+
+void DFS(int _iIndex, int _iCnt) {
+	if (_iCnt == iN / 2) {
+		int iTeamStart{ 0 }, iTeamLink{ 0 };
+
+		for (int i = 0; i < iN; i++)
+		{
+			for (int j = 0; j < iN; j++)
+			{
+				if (vecIsValid[i] && vecIsValid[j])
+					iTeamStart += vecBoard[i][j];
+
+				if (!vecIsValid[i] && !vecIsValid[j])
+					iTeamLink += vecBoard[i][j];
+			}
+		}
+
+		iMinValue = min(iMinValue, abs(iTeamStart - iTeamLink));
+		return;
+	}
+
+	for (int i = _iIndex; i < iN; i++)
+	{
+		if (vecIsValid[i])
+			continue;
+
+		vecIsValid[i] = true;
+		DFS(_iIndex + 1, _iCnt + 1);
+		vecIsValid[i] = false;
+	}
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	cin >> iN;
+	vecBoard.resize(iN, vector<int>(iN));
+	vecIsValid.resize(iN, false);
+
+	for (int iRow = 0; iRow < iN; iRow++)
+	{
+		for (int iCol = 0; iCol < iN; iCol++)
+		{
+			cin >> vecBoard[iRow][iCol];
+		}
+	}
+
+	DFS(0, 0);
+
+	cout << iMinValue;
+
+	return 0;
+}
