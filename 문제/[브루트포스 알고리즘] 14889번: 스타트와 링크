@@ -19,13 +19,12 @@ void DFS(int _iIndex, int _iCnt) {
 
 		for (int i = 0; i < iN; i++)
 		{
-			for (int j = 0; j < iN; j++)
+			for (int j = i + 1; j < iN; j++)
 			{
 				if (vecIsValid[i] && vecIsValid[j])
-					iTeamStart += vecBoard[i][j];
-
-				if (!vecIsValid[i] && !vecIsValid[j])
-					iTeamLink += vecBoard[i][j];
+					iTeamStart += vecBoard[i][j] + vecBoard[j][i];
+				else if (!vecIsValid[i] && !vecIsValid[j])
+					iTeamLink += vecBoard[i][j] + vecBoard[j][i];
 			}
 		}
 
@@ -39,7 +38,7 @@ void DFS(int _iIndex, int _iCnt) {
 			continue;
 
 		vecIsValid[i] = true;
-		DFS(_iIndex + 1, _iCnt + 1);
+		DFS(i + 1, _iCnt + 1);
 		vecIsValid[i] = false;
 	}
 }
