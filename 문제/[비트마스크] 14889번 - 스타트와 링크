@@ -1,0 +1,61 @@
+** 핵심 **
+1. bool 배열도 일종의 비트마스크다
+2. vector랑 일반 배열 속도 차이가 심하다
+3. algorithm 내장 함수(min, abs)는 속도에 차이가 크게 없다
+4. 2중 for문에서 시작인덱스가 0부터 시작과 1부터 시작의 속도 차이가 심하다. 두 배 이상 차이가 난다 (이유는 도저히 모르겠다)
+
+------------------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int iN{ 0 }, iMinValue{ 987654321 };
+bool bCheck[22];
+int iStatus[21][21];
+
+void DFS(int _iCnt, int _iIndex) {
+	if (_iCnt == iN / 2) {
+		int iTeamStart{ 0 }, iTeamLink{ 0 };
+
+		for (int iRow = 1; iRow <= iN; iRow++)
+		{
+			for (int iCol = 1; iCol <= iN; iCol++)
+			{
+				if (bCheck[iRow] && bCheck[iCol])
+					iTeamStart += iStatus[iRow][iCol];
+				if (!bCheck[iRow] && !bCheck[iCol])
+					iTeamLink += iStatus[iRow][iCol];
+			}
+		}
+
+		iMinValue = min(iMinValue, abs(iTeamStart - iTeamLink));
+		return;
+	}
+
+	for (int i = _iIndex; i < iN; i++)
+	{
+		bCheck[i] = true;
+		DFS(_iCnt + 1, i + 1);
+		bCheck[i] = false;
+	}
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	cin >> iN;
+
+	for (int iRow = 1; iRow <= iN; iRow++) {
+		for (int iCol = 1; iCol <= iN; iCol++) {
+			cin >> iStatus[iRow][iCol];
+		}
+	}
+
+	DFS(0, 1);
+
+	cout << iMinValue << "\n";
+
+	return 0;
+}
