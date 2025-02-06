@@ -1,0 +1,91 @@
+** 핵심 **
+1. 종이 조각 문제의 핵심은, 2차원 종이를 1차원 종이로 인식하고, 내부에 이진코드를 채우는 것이다.
+2. 0일 경우 가로로 숫자를 세고, 1일 경우 세로로 숫자를 세는 방식이다.
+3. 가로 세로를 카운트 하는 방식에서는, 2중 for문 후, 방문처리 배열을 통한 3중 for문으로 구현이 가능하다.
+
+**************************************************************************************************
+
+#include <iostream>
+#include <algorithm>
+#include <string>
+using namespace std;
+
+int iRow{ 0 }, iCol{ 0 }, iMaxSum{ 0 };
+char szArrPaper[4][4];
+
+int CalculateMaxSum(int _iArrBitMask[4][4]) {
+	
+	int iSum{ 0 };
+	int iArrCheck[4][4] = { 0 };
+
+	for (int iY = 0; iY < iRow; iY++)
+	{
+		for (int iX = 0; iX < iCol; iX++)
+		{
+			string strNum = "";
+			if (_iArrBitMask[iY][iX] == 0) {
+				for (int iZ = iX; iZ < iCol; iZ++)
+				{
+					if (_iArrBitMask[iY][iZ] == 0 && iArrCheck[iY][iZ] == 0) {
+						strNum += szArrPaper[iY][iZ];
+						iArrCheck[iY][iZ] = 1;
+					} else {
+						break;
+					}
+				}
+			}
+			else if (_iArrBitMask[iY][iX] == 1) {
+				for (int iW = iY; iW < iRow; iW++)
+				{
+					if (_iArrBitMask[iW][iX] == 1 && iArrCheck[iW][iX] == 0) {
+						strNum += szArrPaper[iW][iX];
+						iArrCheck[iW][iX] = 1;
+					} else {
+						break;
+					}
+				}
+			}
+
+			if (!strNum.empty()) {
+				iSum += stoi(strNum);
+			}
+		}
+	}
+
+	return iSum;
+}
+
+int main(void) {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	cin >> iRow >> iCol;
+
+	for (int iY = 0; iY < iRow; iY++)
+	{
+		for (int iX = 0; iX < iCol; iX++)
+		{
+			cin >> szArrPaper[iY][iX];
+		}
+	}
+
+	for (int iSubset = 0; iSubset < (1 << iRow * iCol); iSubset++)
+	{
+		int iArrBitMask[4][4] = { 0 };
+
+		for (int iIndex = 0; iIndex < iRow * iCol; iIndex++)
+		{
+			if (iSubset & (1 << iIndex)) {
+				int iY = iIndex / iCol; 
+				int iX = iIndex % iCol; 
+				iArrBitMask[iY][iX] = 1;
+			}
+		}
+
+		iMaxSum = max(iMaxSum, CalculateMaxSum(iArrBitMask));
+	}
+
+	cout << iMaxSum;
+
+	return 0;
+}
