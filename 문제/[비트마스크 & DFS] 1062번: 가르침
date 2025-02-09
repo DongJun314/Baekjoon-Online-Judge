@@ -1,0 +1,63 @@
+** 핵심 **
+1. 비트마스킹을 활용한 DFS 문제
+2. bool 방문 배열 처리 하던 것을, 비트마스킹으로 활용한 방법
+
+--------------------------------------------------------
+
+#include <iostream>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+int iN{ 0 }, iK{ 0 }, iWords[50], iMaxCnt{ 0 };
+
+void DFS(int _iIndex, int _iK, int _iBitFlag) {
+    if (_iK == iK) {
+        int iCnt{ 0 };
+        for (int iFlag : iWords)
+        {
+            if (iFlag != 0 && (iFlag & _iBitFlag) == iFlag)
+                iCnt++;
+        }
+        iMaxCnt = max(iMaxCnt, iCnt);
+        return;
+    }
+
+    if (_iIndex == 26)
+        return;
+
+    DFS(_iIndex + 1, _iK + 1, _iBitFlag | (1 << _iIndex));
+
+    if (_iIndex != 'a' - 'a'
+        && _iIndex != 'n' - 'a'
+        && _iIndex != 't' - 'a'
+        && _iIndex != 'i' - 'a'
+        && _iIndex != 'c' - 'a') {
+
+        DFS(_iIndex + 1, _iK, _iBitFlag);
+    }
+}
+
+int main(void) {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iN >> iK;
+
+    for (int i = 0; i < iN; i++)
+    {
+        string strWord;
+        cin >> strWord;
+
+        for (char szChar : strWord)
+        {
+            iWords[i] |= (1 << szChar - 'a');
+        }
+    }
+   
+    DFS(0, 0, 0);
+
+    cout << iMaxCnt;
+
+    return 0;
+}
