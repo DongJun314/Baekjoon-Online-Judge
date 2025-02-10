@@ -1,0 +1,234 @@
+** 핵심 **
+1. 이 문제의 핵심은 queue를 사용해서 방향에 따른 값을 구해준다
+2. 재귀에서 memcpy는 사용하지 말 것, 반드시 for문 돌면서 배열 요소 하나하나씩 복사해주기
+
+-----------------------------------------------------------------------------------
+
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include <cstring>
+using namespace std;
+
+const int iMovingCnt{ 5 };
+int iN{ 0 }, iMaxNum{ 0 }, iBoard[20][20];
+enum DIR { UP, DOWN, LEFT, RIGHT};
+
+void CountMaxNum(int _iBoard[20][20]) 
+{
+    for (int iRow = 0; iRow < iN; iRow++)
+    {
+        for (int iCol = 0; iCol < iN; iCol++)
+        {
+            iMaxNum = max(iMaxNum, _iBoard[iRow][iCol]);
+        }
+    }
+}
+
+void CopyBoard(int _Dst[20][20], int _Src[20][20])
+{
+    for (int iRow = 0; iRow < iN; iRow++)
+    {
+        for (int iCol = 0; iCol < iN; iCol++)
+        {
+            _Dst[iRow][iCol] = _Src[iRow][iCol];
+        }
+    }
+}
+
+void UpdateBoard(int _iDir, int _iBoard[20][20]) 
+{
+    queue<int> qNum;
+
+    switch (_iDir)
+    {
+    case UP:
+    {
+        for (int iCol = 0; iCol < iN; iCol++)
+        {
+            for (int iRow = 0; iRow < iN; iRow++)
+            {
+                if (_iBoard[iRow][iCol])
+                    qNum.push(_iBoard[iRow][iCol]);
+
+                _iBoard[iRow][iCol] = 0;
+            }
+
+            int iIndex{ 0 };
+            while (!qNum.empty())
+            {
+                int iNum = qNum.front();
+                qNum.pop();
+
+                if (_iBoard[iIndex][iCol] == 0)
+                {
+                    _iBoard[iIndex][iCol] = iNum;
+                }
+                else if (_iBoard[iIndex][iCol] == iNum)
+                {
+                    _iBoard[iIndex][iCol] += iNum;
+                    iIndex++;
+                }
+                else
+                {
+                    iIndex++;
+                    _iBoard[iIndex][iCol] = iNum;
+                }
+            }
+        }
+    } break;
+
+    case DOWN:
+    {
+        for (int iCol = 0; iCol < iN; iCol++)
+        {
+            int iRow{ iN - 1 };
+            while (iRow >= 0)
+            {
+                if (_iBoard[iRow][iCol])
+                    qNum.push(_iBoard[iRow][iCol]);
+
+                _iBoard[iRow][iCol] = 0;
+                --iRow;
+            }
+
+            int iIndex{ iN - 1 };
+            while (!qNum.empty())
+            {
+                int iNum = qNum.front();
+                qNum.pop();
+
+                if (_iBoard[iIndex][iCol] == 0)
+                {
+                    _iBoard[iIndex][iCol] = iNum;
+                }
+                else if (_iBoard[iIndex][iCol] == iNum)
+                {
+                    _iBoard[iIndex][iCol] += iNum;
+                    iIndex--;
+                }
+                else
+                {
+                    iIndex--;
+                    _iBoard[iIndex][iCol] = iNum;
+                }
+            }
+        }
+    } break;
+
+    case LEFT:
+    {
+        for (int iRow = 0; iRow < iN; iRow++)
+        {
+            for (int iCol = 0; iCol < iN; iCol++)
+            {
+                if (_iBoard[iRow][iCol])
+                    qNum.push(_iBoard[iRow][iCol]);
+
+                _iBoard[iRow][iCol] = 0;
+            }
+
+            int iIndex{ 0 };
+            while (!qNum.empty())
+            {
+                int iNum = qNum.front();
+                qNum.pop();
+
+                if (_iBoard[iRow][iIndex] == 0)
+                {
+                    _iBoard[iRow][iIndex] = iNum;
+                }
+                else if (_iBoard[iRow][iIndex] == iNum)
+                {
+                    _iBoard[iRow][iIndex] += iNum;
+                    iIndex++;
+                }
+                else
+                {
+                    iIndex++;
+                    _iBoard[iRow][iIndex] = iNum;
+                }
+            }
+        }
+    } break;
+
+    case RIGHT:
+    {
+        for (int iRow = 0; iRow < iN; iRow++)
+        {
+            int iCol{ iN - 1 };
+            while (iCol >= 0)
+            {
+                if (_iBoard[iRow][iCol])
+                    qNum.push(_iBoard[iRow][iCol]);
+
+                _iBoard[iRow][iCol] = 0;
+                --iCol;
+            }
+
+            int iIndex{ iN - 1 };
+            while (!qNum.empty())
+            {
+                int iNum = qNum.front();
+                qNum.pop();
+
+                if (_iBoard[iRow][iIndex] == 0)
+                {
+                    _iBoard[iRow][iIndex] = iNum;
+                }
+                else if (_iBoard[iRow][iIndex] == iNum)
+                {
+                    _iBoard[iRow][iIndex] += iNum;
+                    iIndex--;
+                }
+                else
+                {
+                    iIndex--;
+                    _iBoard[iRow][iIndex] = iNum;
+                }
+            }
+        }
+    } break;
+
+    default:
+        break;
+    }
+}
+
+void DFS(int _iCnt, int _iBoard[20][20])
+{
+    if (_iCnt == iMovingCnt) {
+        CountMaxNum(_iBoard);
+        return;
+    }
+
+    for (int iDir = 0; iDir < 4; iDir++)
+    {
+        int iTempBoard[20][20];
+        CopyBoard(iTempBoard, _iBoard);
+        UpdateBoard(iDir, iTempBoard);
+        DFS(_iCnt + 1, iTempBoard);
+    }
+}
+
+int main(void) 
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iN;
+
+    for (int iRow = 0; iRow < iN; iRow++)
+    {
+        for (int iCol = 0; iCol < iN; iCol++)
+        {
+            cin >> iBoard[iRow][iCol];
+        }
+    }
+    
+    DFS(0, iBoard);
+
+    cout << iMaxNum;
+
+    return 0;
+}
