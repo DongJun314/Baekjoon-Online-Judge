@@ -1,0 +1,22 @@
+** 핵심 **
+1. 처음에는 for문을 이용해 풀었지만, XOR연산을 사용하면 좀 더 간편하게 풀 수 있다.
+2. XOR연산자 ^ 는 둘 중에 하나만 1로 켜져 있으면, 1을 반환하고, 둘 다 0 혹은 둘 다 1 일 경우 0을 반환한다.
+
+----------------------------------------------------------------------------------------------------
+
+#include <iostream>
+using namespace std;
+
+int iA{ 0 }, iB{ 0 }, iC{ 0 };
+
+int main(void)
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+
+	cin >> iA >> iB;
+
+	cout << (iA ^ iB);
+
+	return 0;
+}
