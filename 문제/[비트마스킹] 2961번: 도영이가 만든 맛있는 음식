@@ -1,0 +1,44 @@
+** 핵심 ** 
+1. 비트마스킹이라고 뭐든 DFS를 사용하는 것은 아니다.
+2. 비트마스킹이라고 입력 값까지 비트플래그를 사용할 필요는 없다.
+3. 이 문제의 핵심은 비트플래그로 경우의 수를 for문으로 돌면서, 처리 하는 것이다.
+
+--------------------------------------------------------------------------
+
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int iNum{ 0 }, iSours[10], iBitters[10], iMinValue{ 987654321 };
+
+int main(void) 
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iNum;
+
+    for (int i = 0; i < iNum; i++)
+    {
+        cin >> iSours[i] >> iBitters[i];
+    }
+
+
+    for (int iSubset = 1; iSubset < (1 << iNum); iSubset++)
+    {
+        int iSour{ 1 }, iBitter{ 0 };
+        for (int iFlag = 0; iFlag < iNum; iFlag++)
+        {
+            if (iSubset & (1 << iFlag))
+            {
+                iSour *= iSours[iFlag];
+                iBitter += iBitters[iFlag];
+            }
+        }
+        iMinValue = min(iMinValue, abs(iSour - iBitter));
+    }
+   
+    cout << iMinValue;
+
+    return 0;
+}
