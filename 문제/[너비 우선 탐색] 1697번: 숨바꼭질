@@ -1,0 +1,67 @@
+** 핵심 ** 
+1. 이 문제의 핵심은 연결리스트가 필요없이, 단순히 세가지 경우에 대한 BFS 처리만 하면 된다.
+2. 이 코드에 특징은, 원래의 3개의 if문을 배열을 통한 for문으로 바꿔 코드의 간결화를 했다.
+3. sizeof를 사용할땐 항상 유의 깊게 확인하기, c스타일 배열은 배열의 요소의 개수가 아닌, 포인트의 크기가 나온다.
+4. 배열 요소의 개수를 미리 define을 잡아, 메크로화 시킨다.
+
+-------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <queue>
+using namespace std;
+
+#define ARR_CNT(iArr) sizeof(iArr) / sizeof(iArr[0])
+
+int iStartNode{ 0 }, iEndNode{ 0 };
+bool bArrVisited[100001];
+
+void BFS(int _iStartNode)
+{
+    queue<pair<int, int>> qBFS;
+    qBFS.push(make_pair(_iStartNode, 0));
+
+    while (!qBFS.empty())
+    {
+        pair<int, int> prPosSec = qBFS.front();
+        qBFS.pop();
+        int iCurPos = prPosSec.first;
+        int iCurSec = prPosSec.second;
+            
+        if (iCurPos == iEndNode)
+        {
+            cout << iCurSec;
+            break;
+        }
+
+        int iArrNextPos[] = { iCurPos - 1, iCurPos + 1, iCurPos * 2 };
+        int iArrCnt = ARR_SIZE(iArrNextPos);
+
+        for (int i = 0; i < iArrCnt; i++)
+        {
+            int iNextPos = iArrNextPos[i];
+
+            if (iNextPos >= 0 && iNextPos <= 100000)
+            {
+                if (!bArrVisited[iNextPos])
+                {
+                    bArrVisited[iNextPos] = true;
+                    qBFS.push(make_pair(iNextPos, iCurSec + 1));
+                }
+            }
+        }
+    }
+}
+
+int main(void)
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iStartNode >> iEndNode;
+
+    std::fill(std::begin(bArrVisited), std::end(bArrVisited), false);
+    bArrVisited[iStartNode] = true;
+    BFS(iStartNode);
+
+    return 0;
+}
