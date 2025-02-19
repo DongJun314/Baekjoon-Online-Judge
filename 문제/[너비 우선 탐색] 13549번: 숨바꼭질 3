@@ -1,0 +1,63 @@
+#include <iostream>
+#include <deque>
+using namespace std;
+** 핵심 **
+1. 이 문제의 핵심은 "순간이동은 시간이 안든다"이다. 즉, 최단 시간을 찾는거기에, 순간이동을 최우선 탐색한다
+2. 그렇기에, deque의 양방향 자료구조를 사용해, 순간이동은 push_front하고, 나머지는 push_back을 하여, 순간이동을 제일 먼저 탐색한다.
+
+----------------------------------------------------------------------------------------------------------------------------
+
+int iStartPos{ 0 }, iEndPos{ 0 };
+bool bVisited[100001];
+
+void BFS()
+{
+    deque < pair<int, int>> dqBFS;
+    dqBFS.push_back({ iStartPos, 0 });
+    bVisited[iStartPos] = true;
+
+    while (!dqBFS.empty())
+    {
+        pair<int, int> prBFS = dqBFS.front();
+        dqBFS.pop_front();
+
+        int iCurPos = prBFS.first;
+        int iCurSec = prBFS.second;
+
+        if (iCurPos == iEndPos)
+        {
+            cout << iCurSec;
+            break;
+        }
+
+        // 순간이동
+        int iNextWarp = iCurPos * 2;
+        if (iNextWarp <= 100000 && !bVisited[iNextWarp])
+        {
+            bVisited[iNextWarp] = true;
+            dqBFS.push_front({ iNextWarp, iCurSec });
+        }
+
+        // 걷는이동
+        for (int iNextWalk : {iCurPos - 1, iCurPos + 1})
+        {
+            if (iNextWalk >= 0 && iNextWalk <= 100000 && !bVisited[iNextWalk])
+            {
+                bVisited[iNextWalk] = true;
+                dqBFS.push_back({ iNextWalk, iCurSec + 1 });
+            }
+        }
+    }
+}
+
+int main(void)
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iStartPos >> iEndPos;
+
+    BFS();
+
+    return 0;
+}
