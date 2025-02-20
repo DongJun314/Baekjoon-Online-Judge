@@ -1,0 +1,77 @@
+** 핵심 **
+1. 이 문제의 핵심은 탐색 노드를 출력하는 것이다.
+2. 탐색 노드를 int 배열에 새롭게 저장한다. ->  iVisited[iNextPos] = iCurPos; 이런식으로 현재 위치를 다음 노드 위치 배열에 넣는다
+3. 역순서로 노드를 탐색해 배열에 저장한다.
+4. 마지막으로 매열에 있는 노드를 출력한다.
+
+--------------------------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <deque>
+#include <vector>
+using namespace std;
+
+int iStartPos{ 0 }, iEndPos{ 0 };
+bool bVisited[100001];
+int  iVisited[100001];
+vector<int> vecBFS;
+
+void BFS()
+{
+    deque < pair<int, int>> dqBFS;
+    dqBFS.push_back({ iStartPos, 0 });
+    bVisited[iStartPos] = true;
+
+    while (!dqBFS.empty())
+    {
+        pair<int, int> prBFS = dqBFS.front();
+        dqBFS.pop_front();
+
+        int iCurPos = prBFS.first;
+        int iCurSec = prBFS.second;
+
+        if (iCurPos == iEndPos)
+        {
+            cout << iCurSec << '\n';
+
+            int iIndex = iCurPos;
+            while (iIndex != iStartPos)
+            {
+                vecBFS.push_back(iIndex);
+                iIndex = iVisited[iIndex];
+            }
+            vecBFS.push_back(iStartPos);
+
+            int iSize = vecBFS.size();
+            while (iSize--)
+            {
+                cout << vecBFS[iSize] << ' ';
+            }
+
+            break;
+        }
+
+        // 걷는이동
+        for (int iNextPos : {iCurPos - 1, iCurPos + 1, iCurPos * 2})
+        {
+            if (iNextPos >= 0 && iNextPos <= 100000 && !bVisited[iNextPos])
+            {
+                bVisited[iNextPos] = true;
+                iVisited[iNextPos] = iCurPos;
+                dqBFS.push_back({ iNextPos, iCurSec + 1 });
+            }
+        }
+    }
+}
+
+int main(void)
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iStartPos >> iEndPos;
+
+    BFS();
+
+    return 0;
+}
