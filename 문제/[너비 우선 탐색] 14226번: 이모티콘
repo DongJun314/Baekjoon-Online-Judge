@@ -1,0 +1,75 @@
+** 핵심 **
+1. 이 문제의 핵심은 클립보드 변화도 하나의 상태로 보고 방문처리를 해야한다. 
+2. 즉, 2차원 배열을 설정하여, 화면 상태와 클립보드 상태에 따른 방문 처리를 해야한다.
+3. 또한, 화면상태, 클립보드, 시간을 tuple로 묶어서 같이 상태 처리를 한다.
+3. tuple은 get<>()로 가져와야한다 -> 이거 코테때 까먹을 수도 있으니 복습하기.
+
+--------------------------------------------------------------------------------
+
+#include <iostream>
+#include <queue>
+#include <tuple>
+using namespace std;
+
+#define START_NUM_EMOJI 1
+
+int iTotalEmoji{ 0 };
+bool bVisited[1001][1001];
+
+void BFS()
+{
+    queue<tuple<int,int, int>> qBFS;     
+    qBFS.push({ START_NUM_EMOJI,0, 0 });
+    bVisited[START_NUM_EMOJI][0] = true;
+
+    while (!qBFS.empty())
+    {
+        tuple<int, int, int> tpBFS = qBFS.front();
+        qBFS.pop();
+
+        int iCurNum = std::get<0>(tpBFS);
+        int iCurClipBoard = std::get<1>(tpBFS);
+        int iCurSec = std::get<2>(tpBFS);
+
+        if (iCurNum == iTotalEmoji)
+        {
+            cout << iCurSec;
+            break;
+        }
+
+        // 두 번째 연산
+        if (!bVisited[iCurNum + iCurClipBoard][iCurClipBoard] 
+            && iCurNum + iCurClipBoard <= 1000 
+            && iCurClipBoard > 0)
+        {
+            bVisited[iCurNum + iCurClipBoard][iCurClipBoard] = true;
+            qBFS.push({ iCurNum + iCurClipBoard, iCurClipBoard, iCurSec + 1 });
+        }
+
+        // 세 번째 연산
+        if (!bVisited[iCurNum - 1][iCurClipBoard] && iCurNum - 1 >= 2)
+        {
+            bVisited[iCurNum - 1][iCurClipBoard] = true;
+            qBFS.push({ iCurNum - 1,iCurClipBoard, iCurSec + 1 });
+        }
+
+        // 첫 번째 연산
+        if (!bVisited[iCurNum][iCurNum])
+        {
+            bVisited[iCurNum][iCurNum] = true;
+            qBFS.push({ iCurNum,iCurNum, iCurSec + 1 });
+        }
+    }
+}
+
+int main(void)
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iTotalEmoji;
+
+    BFS();
+
+    return 0;
+}
