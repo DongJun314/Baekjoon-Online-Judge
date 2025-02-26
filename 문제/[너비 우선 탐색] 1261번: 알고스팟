@@ -1,0 +1,96 @@
+** 핵심 **
+1. 이 문제의 핵심은 벽이 있고 없고에 대한 처리를해줘야한다.
+2. 나는 tuple로 가중치를 행과 열을 같이 묶어 처리했고, 우선 순위에 대한 처리는 deque를 사용하여, 우선순위가 높은 건 push_front, 낮은 건 push_back으로 처리했다.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <vector>
+#include <deque>
+#include <tuple>
+using namespace std;
+
+int iRow{ 0 }, iCol{ 0 };
+
+int iDir[4][2] = 
+{ 
+  {1, 0}, 
+  {0, 1}, 
+  {-1, 0}, 
+  {0, -1} 
+};
+
+vector<vector<int>> vecMaze;
+vector<vector<bool>> vecVisited;
+
+void BFS()
+{
+    deque<tuple<int, int, int>> dqBFS;
+    dqBFS.push_back({ 0,0,0 });
+    vecVisited[0][0] = true;
+
+    while (!dqBFS.empty())
+    {
+        tuple<int, int, int> tpBFS = dqBFS.front();
+        dqBFS.pop_front();
+
+        int iCurRow  = get<0>(tpBFS);
+        int iCurCol  = get<1>(tpBFS);
+        int iCurDoor = get<2>(tpBFS);
+
+        if (iCurRow == iRow - 1 && iCurCol == iCol - 1)
+        {
+            cout << iCurDoor;
+            break;
+        }
+
+        for (int i = 0; i < size(iDir); i++)
+        {
+            int iNextRow = iCurRow + iDir[i][0];
+            int iNextCol = iCurCol + iDir[i][1];
+
+            if (iNextRow >= 0 && iNextRow < iRow
+                && iNextCol >= 0 && iNextCol < iCol
+                && !vecVisited[iNextRow][iNextCol])
+            {
+                if (vecMaze[iNextRow][iNextCol] == 0)
+                {
+                    vecVisited[iNextRow][iNextCol] = true;
+                    dqBFS.push_front({iNextRow, iNextCol, iCurDoor});
+                }
+                else
+                {
+                    vecVisited[iNextRow][iNextCol] = true;
+                    dqBFS.push_back({ iNextRow, iNextCol, iCurDoor + 1 });
+                }
+            }
+        }
+    }
+}
+
+int main(void)
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iCol >> iRow;
+    vecMaze.resize(iRow, vector<int>(iCol, 0));
+    vecVisited.resize(iRow, vector<bool>(iCol, false));
+
+    for (int iY = 0; iY < iRow; iY++)
+    {
+        string strMaze;
+        cin >> strMaze;
+
+        for (int iX = 0; iX < iCol; iX++)
+        {
+            vecMaze[iY][iX] = strMaze[iX] - '0';
+        }
+    }
+
+    BFS();
+
+    return 0;
+}
