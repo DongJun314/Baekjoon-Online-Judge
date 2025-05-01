@@ -1,0 +1,66 @@
+** 주의 사항 **
+1. 이 문제의 핵심은 DFS, BFS를 사용할 시 시간 초과가 나는것이다.
+2. DFS, BFS없이 구현
+
+------------------------------------------------------------
+
+#include <string>
+#include <vector>
+#include <unordered_set>
+using namespace std;
+
+bool TryMakePair(unordered_set<int>& _usetCardA, unordered_set<int>& _usetCardB, int _iTarget)
+{
+    for(int iA : _usetCardA)
+    {
+        int iB = _iTarget - iA;
+        if(_usetCardB.find(iB) != _usetCardB.end() 
+          && iA != iB)
+        {
+            _usetCardA.erase(iA);
+            _usetCardB.erase(iB);
+            return true;
+        }
+    }
+    return false;
+}
+
+int solution(int coin, vector<int> cards) 
+{       
+    const int iN = cards.size();
+    const int iTarget = iN + 1;
+          int iAnswer = 1;
+    
+    unordered_set<int> usetHands, usetDraws;
+    
+    for(int i = 0; i < iN/3; ++i)
+        usetHands.insert(cards[i]);
+    
+    for(int i = iN/3; i < iN; i+=2)
+    {
+        usetDraws.insert(cards[i]);
+        usetDraws.insert(cards[i+1]);
+        
+        if(TryMakePair(usetHands, usetHands, iTarget))
+        {
+            iAnswer++;
+            continue;
+        }
+        else if(coin >= 1 && TryMakePair(usetHands, usetDraws, iTarget))
+        {
+            coin -= 1;
+        }
+        else if(coin >= 2 && TryMakePair(usetDraws, usetDraws, iTarget))
+        {
+            coin -= 2;
+        }
+        else 
+        {
+            break;
+        }
+        
+        iAnswer++;
+    }
+    
+    return iAnswer;
+}
