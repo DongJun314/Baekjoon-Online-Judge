@@ -1,0 +1,53 @@
+** 핵심 **
+1. 이 문제의 핵심은 정렬 즉 어떤 정렬을 할지 그 정렬 방법이다.
+2. 각종 정렬 방법, sort 조건 정렬, 구조체 조건 정렬, 오버로딩, priority_queue정렬의 차이를 점검하라
+
+-------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct tGrades
+{
+    int iLiterature{ 0 };
+    int iEnglish{ 0 };
+    int iMath{ 0 };
+    string strName{ "" };
+};
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int iStudentCnt{ 0 };
+    cin >> iStudentCnt;
+
+    vector<tGrades> vecStudents;
+
+    for (int i = 0; i < iStudentCnt; i++)
+    {
+        tGrades tStudent;
+        cin >> tStudent.strName >> tStudent.iLiterature >> tStudent.iEnglish >> tStudent.iMath;
+        vecStudents.push_back(tStudent);
+    }
+
+
+    sort(vecStudents.begin(), vecStudents.end(), [](const tGrades& tStuA, const tGrades& tStuB) {
+        if (tStuA.iLiterature != tStuB.iLiterature)
+            return tStuA.iLiterature > tStuB.iLiterature;
+        if (tStuA.iEnglish != tStuB.iEnglish)
+            return tStuA.iEnglish < tStuB.iEnglish;
+        if (tStuA.iMath != tStuB.iMath)
+            return tStuA.iMath > tStuB.iMath;
+        return tStuA.strName < tStuB.strName;
+        });
+    
+   
+    for (int i = 0; i < iStudentCnt; i++)
+        cout << vecStudents[i].strName << '\n';
+    
+    return 0;
+}
