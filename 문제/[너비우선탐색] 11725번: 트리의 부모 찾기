@@ -1,0 +1,56 @@
+** 핵심 ** 
+1. 연결 리스트와, 방문처리와 숫자 기록 배열을 동시에 사용해서 구현
+
+--------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int iNodeCnt{ 0 };
+    cin >> iNodeCnt;
+
+    vector<vector<int>> vecNodeList;
+    vecNodeList.resize(iNodeCnt + 1);
+
+    for (int i = 0; i < iNodeCnt - 1; i++) // 1 2 3 4 5 6
+    {
+        int iNodeA{ 0 }, iNodeB{ 0 };
+        cin >> iNodeA >> iNodeB;
+
+        vecNodeList[iNodeA].push_back(iNodeB);
+        vecNodeList[iNodeB].push_back(iNodeA);
+    }
+
+    vector<int> vecAnsList;
+    vecAnsList.resize(iNodeCnt + 1, -1);
+
+    queue<int> qBFS;
+    qBFS.push(1);
+
+    while (!qBFS.empty())
+    {
+        int iCurNode = qBFS.front();
+        qBFS.pop();
+
+        for (int iNextNode : vecNodeList[iCurNode])
+        {
+            if (-1 != vecAnsList[iNextNode])
+                continue;
+
+            vecAnsList[iNextNode] = iCurNode;
+            qBFS.push(iNextNode);
+        }
+    }
+
+    for (int i = 2; i <= iNodeCnt; i++) 
+        cout << vecAnsList[i] << '\n';
+    
+    return 0;
+}
