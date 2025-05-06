@@ -1,0 +1,47 @@
+** 핵심 **
+1. 이 문제는 투포인터와 누적합에 대한 문제다.
+2. 연속된 합을 구해야할 경우 누적합을 떠올리자
+3. 슬라이딩 포인터 또는 투 포인터로 이를 조절하며 조건에 맞는 누적합을 찾는다.
+
+------------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int iNum{ 0 }, iSum{ 0 };
+    cin >> iNum >> iSum;
+
+    vector<int> vecSumList;
+    vecSumList.resize(iNum + 1, 0);
+
+    for (int i = 1; i <= iNum; i++)
+    {
+        int iNumList{ 0 };
+        cin >> iNumList;
+        vecSumList[i] = vecSumList[i - 1] + iNumList;
+    }
+
+    int iLeftIdx{ 0 }, iRightIdx{ 1 }, iAnswer{ iNum + 1 };
+    while (iLeftIdx < iRightIdx && iRightIdx <= iNum)
+    {
+        if (vecSumList[iRightIdx] - vecSumList[iLeftIdx] >= iSum)
+        {
+            iAnswer = min(iAnswer, iRightIdx - iLeftIdx);
+            iLeftIdx++;
+        }
+        else if (vecSumList[iRightIdx] - vecSumList[iLeftIdx] < iSum)
+        {
+            iRightIdx++;
+        }
+    }
+    
+    cout << (iAnswer == iNum + 1 ? 0 : iAnswer);
+    return 0;
+}
