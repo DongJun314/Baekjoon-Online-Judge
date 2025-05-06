@@ -1,0 +1,64 @@
+** 핵심 **
+1. 투포인트를 사용하지만, 유사 이분탐색 같은 방식으로 양끝 인덱스에서 시작
+2. 투포인터의 핵심은 -> 
+  📌 핵심 직관:
+  양 끝에서 시작해서, 합이 0에 가까워지도록 조절한다.
+  sum이 작으면 → 더 큰 수 필요 → left를 오른쪽으로
+  sum이 크면 → 더 작은 수 필요 → right를 왼쪽으로
+3. 추가로 마지막 출력을 오름차순으로 해야하는 것(이것 때문에 틀렸었다)
+
+**********************************************************************
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+const int stiLqCnt{ 2 };
+
+struct tLiquids
+{
+    int iAnsLqA{ 0 };
+    int iAnsLqB{ 0 };
+};
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int iNum{ 0 };
+    cin >> iNum;
+
+    vector<int> vecNumList;
+    vecNumList.resize(iNum, 0);
+
+    for (int i = 0; i < iNum; i++)
+        cin >> vecNumList[i];
+
+    sort(vecNumList.begin(), vecNumList.end());
+
+    int iLeftIdx{ 0 }, iRightIdx{ iNum - 1 }, iMinSum{ 2000000000 };
+    tLiquids tLqs{ 0,0 };
+
+    while (iLeftIdx< iRightIdx)
+    {
+        int iSum = vecNumList[iLeftIdx] + vecNumList[iRightIdx];
+        int iAbsSum = abs(iSum);
+
+        if (iMinSum > iAbsSum)
+        {
+            iMinSum = iAbsSum;
+            tLqs.iAnsLqA = vecNumList[iLeftIdx];
+            tLqs.iAnsLqB = vecNumList[iRightIdx];
+        }
+
+        if (iSum < 0) { iLeftIdx++; }
+        else { iRightIdx--; }
+    }
+
+    int iMin = min(tLqs.iAnsLqA, tLqs.iAnsLqB);
+    int iMax = max(tLqs.iAnsLqA, tLqs.iAnsLqB);
+    cout << iMin << ' ' << iMax << '\n';
+    return 0;
+}
