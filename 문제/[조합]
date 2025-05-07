@@ -1,0 +1,71 @@
+** 핵심 **
+1. 조합을 통한 비교
+
+
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <set>
+using namespace std;
+
+const vector<char> FIRST_THIRD = {'b','d','g','n','p','r','s','t'};
+const vector<char> SECOND_FOURTH = {'a','e','i','o','u'};
+
+// (a, b) 계산 함수
+pair<int, int> compare(const string& a, const string& b) {
+    int same = 0, diff = 0;
+    for (int i = 0; i < 4; ++i) {
+        if (a[i] == b[i]) same++;
+        else diff++;
+    }
+    return {same, diff};
+}
+
+int main() {
+    // 1. 후보 생성
+    vector<string> candidates;
+    for (char c1 : FIRST_THIRD) {
+        for (char c2 : SECOND_FOURTH) {
+            for (char c3 : FIRST_THIRD) {
+                for (char c4 : SECOND_FOURTH) {
+                    string dino = {c1, c2, c3, c4};
+                    candidates.push_back(dino);
+                }
+            }
+        }
+    }
+
+    // 2. 입력
+    int n;
+    cin >> n;
+
+    vector<tuple<string, int, int>> queries;
+    for (int i = 0; i < n; ++i) {
+        string s;
+        int a, b;
+        cin >> s >> a >> b;
+        queries.emplace_back(s, a, b);
+    }
+
+    // 3. 후보 필터링
+    vector<string> valid = candidates;
+
+    for (auto [s, a, b] : queries) {
+        vector<string> next;
+        for (const string& d : valid) {
+            auto [same, diff] = compare(s, d);
+            if (same == a && diff == b)
+                next.push_back(d);
+        }
+        valid = next;
+    }
+
+    // 4. 출력
+    if (valid.size() == 1)
+        cout << valid[0] << '\n';
+    else
+        cout << "x\n";
+
+    return 0;
+}
