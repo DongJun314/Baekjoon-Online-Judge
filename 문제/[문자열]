@@ -1,0 +1,43 @@
+** 핵심 ** 
+1. 핵심은 슬라이딩 윈도우 같은 방식으로, 문자열을 슬라이딩하면서 비교하는 방식
+
+----------------------------------------------------------------------
+
+#include <iostream>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+int CalMinDiff(const string& _strA, const string& _strB)
+{
+    const int iStrALength = _strA.length();
+    const int iStrBLength = _strB.length();
+    const int iLengthDiff = iStrBLength - iStrALength;
+
+    int iMinDiff = _strB.length();
+    for (int iB = 0; iB <= iLengthDiff; ++iB)
+    {
+        int iDiff{ 0 };
+        for (int iA = 0; iA < iStrALength; ++iA)
+        {
+            if (_strA[iA] != _strB[iB + iA])
+                ++iDiff;
+        }
+        iMinDiff = min(iMinDiff, iDiff);
+    }
+    return iMinDiff;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    string strA, strB;
+    cin >> strA >> strB;
+
+    int iAns = CalMinDiff(strA, strB);
+    cout << iAns;
+
+    return 0;
+}
