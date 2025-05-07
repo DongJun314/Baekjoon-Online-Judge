@@ -1,0 +1,61 @@
+** 핵심 **
+1. 신기한 인접리스트와 방문배열
+
+
+#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <queue>
+using namespace std;
+
+int main() {
+    int M, N; // M: 웜홀 개수, N: 최대 허용 크기
+    cin >> M >> N;
+
+    unordered_map<int, vector<int>> adj;
+    unordered_set<int> nodes; // 전체 등장 노드 추적
+
+    // 입력: 웜홀 간선 쌍
+    for (int i = 0; i < M; ++i) {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+        nodes.insert(u);
+        nodes.insert(v);
+    }
+
+    unordered_set<int> visited;
+    int answer = 0;
+
+    // 모든 노드에 대해 연결 요소 탐색
+    for (int node : nodes) {
+        if (visited.count(node)) continue;
+
+        // BFS 시작
+        int count = 0;
+        queue<int> q;
+        q.push(node);
+        visited.insert(node);
+
+        while (!q.empty()) {
+            int cur = q.front(); q.pop();
+            count++;
+
+            for (int neighbor : adj[cur]) {
+                if (!visited.count(neighbor)) {
+                    visited.insert(neighbor);
+                    q.push(neighbor);
+                }
+            }
+        }
+
+        // 조건 만족하면 정답 누적
+        if (count <= N)
+            answer += count;
+    }
+
+    cout << answer << '\n';
+    return 0;
+}
