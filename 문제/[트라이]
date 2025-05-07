@@ -1,0 +1,106 @@
+** 핵심 **
+1. 여기의 핵심은 트라이 구조체와 클래스를 만들고 내부에 insert와 contain함수이다.
+2. unordered_map은 [] 자체로 생성자 역활을 한다.
+3. contain함수는 
+    * 매개변수 string에 욕설 정보가 들어있는 map을 비교하는게 아니라
+    * 매개변수 string을 map에 비교하는 방식이다.
+
+
+---------------------핵심 로직-----------------------------
+struct TrieNode {
+    bool isEnd;
+    unordered_map<char, TrieNode*> next;
+};
+
+class Trie {
+    TrieNode* root;
+
+public:
+    void insert(string word);
+    bool containsIn(string text); // 핵심
+};
+--------------------------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <unordered_map>
+using namespace std;
+
+// Trie의 각 노드 정의
+struct TrieNode {
+    bool isEnd;  // 단어 끝 여부
+    unordered_map<char, TrieNode*> next;  // 자식 문자 경로
+
+    TrieNode() : isEnd(false) {}
+};
+
+// Trie 클래스
+class Trie {
+public:
+    TrieNode* root;
+
+    Trie() {
+        root = new TrieNode();
+    }
+
+    // 욕설 단어 삽입
+    void insert(const string& word) {
+        TrieNode* node = root;
+        for (char ch : word) {
+            if (!node->next.count(ch)) {
+                node->next[ch] = new TrieNode();
+            }
+            node = node->next[ch];
+        }
+        node->isEnd = true;  // 이 위치까지가 하나의 단어
+    }
+
+    // 문장 안에 욕설이 포함되어 있는지 검사
+    bool containsIn(const string& text) {
+        int len = text.length();
+
+        for (int start = 0; start < len; ++start) {
+            TrieNode* node = root;  // 매번 root부터 시작
+
+            for (int pos = start; pos < len; ++pos) {
+                char ch = text[pos];
+
+                if (!node->next.count(ch))
+                    break;
+
+                node = node->next[ch];
+
+                if (node->isEnd)
+                    return true;  // 욕설 포함됨
+            }
+        }
+        return false;  // 어떤 욕설도 포함되지 않음
+    }
+};
+
+int main() {
+    int N;
+    cin >> N;
+
+    Trie trie;
+    vector<string> result;
+
+    string s;
+    for (int i = 0; i < N; ++i) {
+        cin >> s;
+
+        if (trie.containsIn(s)) {
+            result.push_back(s);  // 욕설 포함된 줄 저장
+        }
+
+        trie.insert(s);  // 입력된 단어는 항상 욕설 후보로 등록
+    }
+
+    // 출력
+    for (const string& r : result)
+        cout << r << '\n';
+
+    return 0;
+}
+
+
