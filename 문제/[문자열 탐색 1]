@@ -1,5 +1,8 @@
+** 핵심 **
+1. 이문제의 핵심은 string의 find함수다
+2. 입력 즉시 과거 push_back했던 문자열과 비교
 
-
+------------------------------------------
 
 #include <iostream>
 #include <vector>
