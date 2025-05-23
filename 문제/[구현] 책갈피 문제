@@ -1,0 +1,55 @@
+** 핵심 **
+1. 이 문제의 핵심은 자료구조로 무엇을 사용할것이냐에 따라 다르다.
+2. 시간복잡도를 잘 생각해서 구현해야한다.
+
+-------------------------------------------------------------
+
+#include <iostream>
+#include <list>
+using namespace std;
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int iBookCnt{ 0 };
+    cin >> iBookCnt;
+
+    list<int> lstBooks;
+    for (int i = 0; i < iBookCnt; i++)
+    {
+        int iBook{ 0 };
+        cin >> iBook;
+        lstBooks.push_back(iBook);
+    }
+
+    int iWantedBookCnt{ 0 }, iAns{ 0 };
+    cin >> iWantedBookCnt;
+
+    for (int i = 0; i < iWantedBookCnt; i++)
+    {
+        int iSearchBook{ 0 };
+        cin >> iSearchBook;
+
+        int iIndex{ 0 };
+        for (list<int>::iterator iter = lstBooks.begin(); iter != lstBooks.end(); ++iter)
+        {
+            ++iIndex;
+
+            if (*iter == iSearchBook)
+            {
+                iAns += lstBooks.size() - iIndex;
+                lstBooks.erase(iter);
+                lstBooks.push_back(iSearchBook);
+                break;
+            }
+        }
+    }
+
+    cout << iAns;
+
+    return 0;
+}
+
+
