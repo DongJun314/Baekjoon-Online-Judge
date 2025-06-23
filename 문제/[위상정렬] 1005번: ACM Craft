@@ -1,2 +1,92 @@
 ** 핵심 **
-1. 
+1. indegree배열을 활용해, 자신을 가르키고 있는 노드가 0일 경우 queue에 넣어 BFS를 돌린다
+
+==================================================================
+==================================================================
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+    
+    int testCase;
+    cin >> testCase;
+
+    for (int iCase = 0; iCase < testCase; ++iCase)
+    {
+        int towerN, towerK;
+        cin >> towerN >> towerK;
+
+        vector<int> buildTimes;
+        {
+            buildTimes.resize(towerN + 1, 0);
+            
+            for (int tower = 1; tower <= towerN; ++tower)
+            {
+                cin >> buildTimes[tower];
+            }
+        }
+        
+        vector<vector<int>> buildOrders;
+        vector<int> towerLinkInfo;
+        {
+            buildOrders.resize(towerN + 1);
+            towerLinkInfo.resize(towerN + 1, 0);
+
+            for (int buildOrder = 0; buildOrder < towerK; buildOrder++)
+            {
+                int x, y;
+                cin >> x >> y;
+                buildOrders[x].push_back(y);
+                ++towerLinkInfo[y];
+            }
+        }
+        
+        int targetTower;
+        cin >> targetTower;
+
+        vector<int> ansTime(towerN + 1, 0);
+        queue<pair<int, int>> BFS;
+        {
+            for (int tower = 1; tower <= towerN; ++tower)
+            {
+                if (0 == towerLinkInfo[tower])
+                {
+                    ansTime[tower] = buildTimes[tower];
+                    BFS.push({ tower, buildTimes[tower] });
+                }
+            }
+
+            while (!BFS.empty())
+            {
+                int curTower = BFS.front().first;
+                int curBuildTime = BFS.front().second;
+                BFS.pop();
+
+                for (int i = 0; i < buildOrders[curTower].size(); ++i) 
+                {
+                    int nextTower = buildOrders[curTower][i];
+                    int nextBuildTime = curBuildTime + buildTimes[nextTower];
+
+                    ansTime[nextTower] = max(ansTime[nextTower], nextBuildTime);
+
+                    if (--towerLinkInfo[nextTower] == 0) 
+                    {
+                        BFS.push({ nextTower, ansTime[nextTower] });
+                    }
+                }
+            }
+        }
+
+        cout << ansTime[targetTower];
+    }
+
+    return 0;
+}
+
