@@ -1,0 +1,75 @@
+** 핵심 **
+1. 소용돌이 로직 파악하기
+2. 예쁘게 출력하기 위한 공백 작업 수행
+
+============================================
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+using namespace std;
+
+int CalTornado(int _iRow, int _iCol)
+{
+    int n = max(abs(_iRow), abs(_iCol));
+    int maxNum = (2 * n + 1) * (2 * n + 1);
+
+    if (0 == _iRow && 0 == _iCol)
+    {
+        return 1;
+    }
+
+    if (_iRow == n && _iCol != -n)
+    {
+        return maxNum - (n - _iCol);
+    }
+    else if (_iRow != -n && _iCol == -n)
+    {
+        return maxNum - (n - _iRow) - (2 * n);
+    }
+    else if (_iRow == -n && _iCol != n)
+    {
+        return maxNum - (n + _iCol) - (4 * n);
+    }
+    else if (_iRow != n && _iCol == n)
+    {
+        return maxNum - (n + _iRow) - (6 * n);
+    }
+
+    return -1;
+}
+
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int iRowA, iColA, iRowB, iColB;
+    cin >> iRowA >> iColA >> iRowB >> iColB;
+
+    int rowMin = min(iRowA, iRowB), rowMax = max(iRowA, iRowB);
+    int colMin = min(iColA, iColB), colMax = max(iColA, iColB);
+
+    int maxAbs = max({ abs(rowMin), abs(rowMax), abs(colMin), abs(colMax) });
+    int maxVal = (2 * maxAbs + 1) * (2 * maxAbs + 1);
+    int width = to_string(maxVal).size();
+
+    for (int row = rowMin; row <= rowMax; row++)
+    {
+        for (int col = colMin; col <= colMax; col++)
+        {
+            int val = CalTornado(row, col);
+            string s = to_string(val);
+            int padding = width - s.size();
+
+            if (col != colMin) cout << ' ';
+            for (int i = 0; i < padding; i++) cout << ' ';
+            cout << s;
+        }
+        cout << '\n';
+    }
+
+    return 0;
+}
