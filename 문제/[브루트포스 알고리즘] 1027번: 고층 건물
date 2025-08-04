@@ -1,0 +1,74 @@
+** 핵심 **
+1. 이 문제의 핵심은 기울기 공식을 활용한 비교 문제
+2. double 반환형일때는 피연산자 중 하나를 double로 캐스팅하기, 아니면 소수점 이하가 날라감
+
+=================================================================================
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+const double MIN_SLOPE = -1000000000;
+const double MAX_SLOPE = 1000000000;
+
+int CountMaxVisibleBuildings(const vector<int>& vecBuildings)
+{
+    int iCountMaxVisibleBuildings = 0;
+
+    for (int iCurBuilding = 1; iCurBuilding < vecBuildings.size(); ++iCurBuilding)
+    {   
+        int iCountVisibleBuildings = 0;
+
+        // Right Visible Buildings
+        double dRightSlope = MIN_SLOPE;
+        for (int iRightVisibleBuilding = iCurBuilding + 1; iRightVisibleBuilding < vecBuildings.size(); ++iRightVisibleBuilding)
+        {
+            double dSlope = (double)(vecBuildings[iRightVisibleBuilding] - vecBuildings[iCurBuilding]) / (iRightVisibleBuilding - iCurBuilding);
+
+            if (dSlope > dRightSlope)
+            {
+                dRightSlope = dSlope;
+                ++iCountVisibleBuildings;
+            }
+        }
+
+        // Left Visible Buildings
+        double dLeftSlop = MAX_SLOPE;
+        for (int iLeftVisibleBuilding = iCurBuilding - 1; iLeftVisibleBuilding > 0; --iLeftVisibleBuilding)
+        {
+            double dSlope = (double)(vecBuildings[iLeftVisibleBuilding] - vecBuildings[iCurBuilding]) / (iLeftVisibleBuilding - iCurBuilding);
+
+            if (dSlope < dLeftSlop)
+            {
+                dLeftSlop = dSlope;
+                ++iCountVisibleBuildings;
+            }
+        }
+
+        iCountMaxVisibleBuildings = max(iCountMaxVisibleBuildings, iCountVisibleBuildings);
+    }
+    
+    return iCountMaxVisibleBuildings;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int iN;
+    cin >> iN;
+
+    vector<int> vecBuildings;
+    vecBuildings.resize(iN + 1, 0);
+
+    for (int i = 1; i <= iN; i++)
+    {
+        cin >> vecBuildings[i];
+    }
+
+    cout << CountMaxVisibleBuildings(vecBuildings);
+
+    return 0;
+}
