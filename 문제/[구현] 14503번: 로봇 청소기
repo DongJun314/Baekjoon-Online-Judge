@@ -1,0 +1,93 @@
+** 핵심 **
+1. 시뮬레이션, DFS 비슷한 방식으로 구현
+
+======================================================================
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+typedef pair<int, int> DIR;                        
+vector<DIR> vecDir = { {-1, 0},{0, 1},{1, 0},{0, -1} }; //북, 동, 남, 서 
+
+void CountCleanedSlots(vector<vector<int>>& vecRoom, int iCurRow, int iCurCol, int iCurDir, int iCount)
+{
+    if (0 == vecRoom[iCurRow][iCurCol])
+    {
+        ++iCount;
+        vecRoom[iCurRow][iCurCol] = 2;
+    }
+
+    bool bIsAllCleaned = true;
+    for (int i = 0; i < vecDir.size(); i++)
+    {
+        int iNextRow = iCurRow + vecDir[i].first;
+        int iNextCol = iCurCol + vecDir[i].second;
+
+        if (0 == vecRoom[iNextRow][iNextCol])
+        {
+            bIsAllCleaned = false;
+            break;
+        }
+    }
+
+    if (bIsAllCleaned)
+    {
+        int iBackDir = (iCurDir + 2) % 4; 
+        int iBackRow = iCurRow + vecDir[iBackDir].first;
+        int iBackCol = iCurCol + vecDir[iBackDir].second;
+
+        if (1 == vecRoom[iBackRow][iBackCol])
+        {
+            cout << iCount;
+            return;
+        }
+        else
+        {
+            CountCleanedSlots(vecRoom, iBackRow, iBackCol, iCurDir, iCount);
+        }
+    }
+    else
+    {
+        int iRotatedDir = iCurDir;
+        for (int i = 0; i < vecDir.size(); i++)
+        {
+            iRotatedDir = (iRotatedDir + 3) % 4;
+            int iRotatedRow = iCurRow + vecDir[iRotatedDir].first;
+            int iRotatedCol = iCurCol + vecDir[iRotatedDir].second;
+
+            if (0 == vecRoom[iRotatedRow][iRotatedCol])
+            {
+                CountCleanedSlots(vecRoom, iRotatedRow, iRotatedCol, iRotatedDir, iCount);
+                break;
+            }
+        }
+    }
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int iN, iM;
+    cin >> iN >> iM;
+
+    int iRow, iCol, iDir;
+    cin >> iRow >> iCol >> iDir;
+
+    vector<vector<int>> vecRoom;
+    vecRoom.resize(iN, vector<int>(iM));
+
+    for (int row = 0; row < iN; row++)
+    {
+        for (int col = 0; col < iM; col++)
+        {
+            cin >> vecRoom[row][col];
+        }
+    }
+
+    CountCleanedSlots(vecRoom, iRow, iCol, iDir, 0);
+
+    return 0;
+}
