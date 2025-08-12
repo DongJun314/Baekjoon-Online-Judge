@@ -1,0 +1,137 @@
+** 핵심 **
+1. 이 문제의 핵심은, 지문에서 나왔듯이, 동시에 적을 없애는 방식이다.
+2. 즉, 적의 위치를 발견후, 적을 set에 넣고, 동식에 지우고, 다시 한칸 위로 움직인 후 적을 제거한다.
+
+====================================================================
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+const int ARCHER = -1;
+
+bool KilledEnemyIfInAttackZone(vector<vector<int>>& vecGameStage, const int& iCurRow, const int& iCurDist, const int& iArcherCol)
+{
+    int iRow = iCurRow; // 5
+    int iCol = vecGameStage[0].size() - 1;
+    int iLeftCol = iArcherCol - iCurDist + 1 < 0 ? 0 : iArcherCol - iCurDist + 1;
+    int iRightCol = iArcherCol + iCurDist - 1 > iCol ? iCol : iArcherCol + iCurDist - 1;
+
+    // 왼쪽 오름차순
+    int iLeftRow = iRow;
+    for (int iCurLeftCol = iLeftCol; iCurLeftCol < iArcherCol; iCurLeftCol++)
+    {
+        if (1 == vecGameStage[iLeftRow][iCurLeftCol])
+        {
+            vecGameStage[iLeftRow][iCurLeftCol] = 0;
+            return true;
+        }
+
+        --iLeftRow;
+    }
+
+    // 중간
+    if (1 == vecGameStage[iRow - iCurDist + 1][iArcherCol])
+    {
+        vecGameStage[iRow - iCurDist + 1][iArcherCol] = 0;
+        return true;
+    }
+
+    // 오른쪽 내림차순
+    int iRightRow = iRow - iCurDist + 2;
+    for (int iCurRightCol = iArcherCol + 1; iCurRightCol <= iRightCol; iCurRightCol++)
+    {
+        if (1 == vecGameStage[iRightRow][iCurRightCol])
+        {
+            vecGameStage[iRightRow][iCurRightCol] = 0;
+            return true;
+        }
+
+        ++iRightRow;
+    }
+
+    return false;
+}
+
+void CountKilledEnemy(vector<vector<int>>& vecGameStage, const vector<int>& vecArchers, const int& iDist, int& iCnt)
+{
+    for (int iCurRow = vecGameStage.size() - 1; iCurRow >= 0; --iCurRow)
+    {
+        for (int i = 0; i < vecArchers.size(); ++i)
+        {
+            if (ARCHER == vecArchers[i])
+            {
+                int iCurDist = 0;
+
+                while (++iCurDist)
+                {
+                    if (iDist < iCurDist || KilledEnemyIfInAttackZone(vecGameStage, iCurRow, iCurDist, i))
+                    {
+                        ++iCnt;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+int CountMaxKilledEnemy(vector<vector<int>>& vecGameStage, vector<int>& vecArchers, const int& iDist)
+{
+    const int iColSize = vecGameStage[0].size();
+
+    int iMaxCnt = 0;
+    for (int i1stArcher = 0; i1stArcher < iColSize; ++i1stArcher)
+    {
+        vecArchers[i1stArcher] = ARCHER;
+        {
+            for (int i2ndArcher = i1stArcher + 1; i2ndArcher < iColSize; ++i2ndArcher)
+            {
+                vecArchers[i2ndArcher] = ARCHER;
+                {
+                    for (int i3rdArcher = i2ndArcher + 1; i3rdArcher < iColSize; ++i3rdArcher)
+                    {
+                        vecArchers[i3rdArcher] = ARCHER;
+                        {
+                            int iCnt = 0;
+                            CountKilledEnemy(vecGameStage, vecArchers, iDist, iCnt);
+                            iMaxCnt = max(iMaxCnt, iCnt);
+                        }
+                        vecArchers[i3rdArcher] = 0;
+                    }
+                }
+                vecArchers[i2ndArcher] = 0;
+            }
+        }
+        vecArchers[i1stArcher] = 0;
+    }
+    return iMaxCnt;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int iRowSize, iColSize, iDist;
+    cin >> iRowSize >> iColSize >> iDist;
+
+    vector<vector<int>> vecGameStage;
+    vecGameStage.resize(iRowSize, vector<int>(iColSize));
+
+    for (int iRow = 0; iRow < iRowSize; iRow++)
+    {
+        for (int iCol = 0; iCol < iColSize; iCol++)
+        {
+            cin >> vecGameStage[iRow][iCol];
+        }
+    }
+
+    vector<int> vecArchers;
+    vecArchers.resize(iColSize, 0);
+
+    cout << CountMaxKilledEnemy(vecGameStage, vecArchers, iDist);
+
+    return 0;
+}
