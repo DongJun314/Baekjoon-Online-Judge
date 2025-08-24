@@ -1,0 +1,96 @@
+** 핵심 **
+1. 다이아몬드 별찍기를 멘해튼 거리로 계산해서 구한다
+
+================================================
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+const int FIRE = 0, ICE = 1;
+
+void ExpandAreaAndCalTemperatureByMin(vector<vector<long long>>& vecTemper, const int& iRow, const int& iCol, const int& iCurMin, const int& Totem)
+{
+    int n = vecTemper.size();
+
+    if (Totem == FIRE)
+    {
+        // 정사각형 영역 (체비쇼프 거리)
+        for (int r = max(0, iRow - iCurMin); r <= min(n - 1, iRow + iCurMin); r++)
+        {
+            for (int c = max(0, iCol - iCurMin); c <= min(n - 1, iCol + iCurMin); c++)
+            {
+                vecTemper[r][c] += 1;
+            }
+        }
+    }
+    else if (Totem == ICE)
+    {
+        // 다이아몬드 영역 (맨해튼 거리)
+        for (int r = max(0, iRow - iCurMin); r <= min(n - 1, iRow + iCurMin); r++)
+        {
+            for (int c = max(0, iCol - iCurMin); c <= min(n - 1, iCol + iCurMin); c++)
+            {
+                if (abs(r - iRow) + abs(c - iCol) <= iCurMin)
+                {
+                    vecTemper[r][c] -= 1;
+                }
+            }
+        }
+    }
+}
+
+vector<vector<long long>> solution(int n, int m, vector<vector<int>> fires, vector<vector<int>> ices)
+{
+    vector<vector<long long>> vecTemper;
+    vecTemper.resize(n, vector<long long>(n, 0));
+
+    for (int iCurMin = 1; iCurMin <= m; iCurMin++)
+    {
+        for (int iFire = 0; iFire < fires.size(); ++iFire)
+        {
+            int iRow = fires[iFire][0] - 1;
+            int iCol = fires[iFire][1] - 1;
+
+            // Expand fire area
+            ExpandAreaAndCalTemperatureByMin(vecTemper, iRow, iCol, iCurMin, FIRE);
+        }
+
+        for (int iIce = 0; iIce < ices.size(); ++iIce)
+        {
+            int iRow = ices[iIce][0] - 1;
+            int iCol = ices[iIce][1] - 1;
+
+            // Expand ice area
+            ExpandAreaAndCalTemperatureByMin(vecTemper, iRow, iCol, iCurMin, ICE);
+        }
+    }
+
+    return vecTemper;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    // 상수 박기 (프로그래머스 스타일)
+    int n = 5, m = 2;
+    vector<vector<int>> fires = { {1, 1} };
+    vector<vector<int>> ices = { {3, 3} };
+    vector<vector<long long>> result = solution(n, m, fires, ices);
+
+    // 출력
+    for (int i = 0; i < n; i++) 
+    {
+        for (int j = 0; j < n; j++) 
+        {
+            cout << result[i][j] << " ";
+        }
+        cout << "\n";
+    }
+
+    return 0;
+}
