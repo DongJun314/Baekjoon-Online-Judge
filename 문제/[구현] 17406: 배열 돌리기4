@@ -1,0 +1,160 @@
+** 핵심 **
+1. 구현 문제, 문제를 크게 보고, 작게 세분화해 차근차근 구현하기
+2. 배열 돌리는 두가지 방법에 대한 장단점을 이해하고 쓰기
+
+===============================================================
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct ROWCOL
+{
+    int Row;
+    int Col;
+};
+
+const int MAX_INT = 2000000000; 
+
+void RotateArray(vector<vector<int>>& vecArray, const pair<ROWCOL, ROWCOL>& vecCoord)
+{
+    int iTopRow = vecCoord.first.Row;
+    int iLeftCol = vecCoord.first.Col;
+    int iBottomRow = vecCoord.second.Row;
+    int iRightCol = vecCoord.second.Col;
+
+    while (iTopRow != iBottomRow && iLeftCol != iRightCol)
+    {
+        // the way of using 1d vector;
+        {
+            vector<int> border;
+
+            // push outline value into vector
+            for (int topCol = iLeftCol; topCol < iRightCol; ++topCol)
+                border.push_back(vecArray[iTopRow][topCol]);
+            for (int rightRow = iTopRow; rightRow < iBottomRow; ++rightRow)
+                border.push_back(vecArray[rightRow][iRightCol]);
+            for (int bottomCol = iRightCol; bottomCol > iLeftCol; --bottomCol)
+                border.push_back(vecArray[iBottomRow][bottomCol]);
+            for (int leftRow = iBottomRow; leftRow > iTopRow; --leftRow)
+                border.push_back(vecArray[leftRow][iLeftCol]);
+
+            // Rotate
+            int iIndex = 0;
+            for (int topCol = iLeftCol + 1; topCol <= iRightCol; ++topCol)
+                vecArray[iTopRow][topCol] = border[iIndex++];
+            for (int rightRow = iTopRow + 1; rightRow <= iBottomRow; ++rightRow)
+                vecArray[rightRow][iRightCol] = border[iIndex++];
+            for (int bottomCol = iRightCol - 1; bottomCol >= iLeftCol; --bottomCol)
+                vecArray[iBottomRow][bottomCol] = border[iIndex++];
+            for (int leftRow = iBottomRow - 1; leftRow >= iTopRow; --leftRow)
+                vecArray[leftRow][iLeftCol] = border[iIndex++];
+        } 
+
+        
+        {
+            /* // second way of using swap algorithm without using vector
+            int iTemp = vecArray[iTopRow][iLeftCol];
+            for (int leftRow = iTopRow + 1; leftRow <= iBottomRow; ++leftRow)
+                swap(vecArray[leftRow][iLeftCol], iTemp);
+            for (int bottomCol = iLeftCol + 1; bottomCol <= iRightCol; ++bottomCol)
+                swap(vecArray[iBottomRow][bottomCol], iTemp);
+            for (int rightRow = iBottomRow - 1; rightRow >= iTopRow; --rightRow)
+                swap(vecArray[rightRow][iRightCol], iTemp);
+            for (int topCol = iRightCol - 1; topCol >= iLeftCol; --topCol)
+                swap(vecArray[iTopRow][topCol], iTemp);
+            */
+        }
+
+        ++iTopRow; --iBottomRow;
+        ++iLeftCol; --iRightCol;
+    }
+}
+
+int CalMinValue(const vector<vector<int>>& vecArray)
+{
+    int iMinValue = MAX_INT;
+    for (int iRow = 0; iRow < vecArray.size(); iRow++)
+    {
+        int iMin = 0;
+        for (int iCol = 0; iCol < vecArray[0].size(); iCol++)
+        {
+            iMin += vecArray[iRow][iCol];
+        }
+        iMinValue = min(iMinValue, iMin);
+    }
+    return iMinValue;
+}
+
+void GeneratePermutations(vector<vector<int>> vecArray, const vector<pair<ROWCOL, ROWCOL>>& vecCoords, vector<pair<ROWCOL, ROWCOL>>& vecPermutations, vector<bool>& bVisited, int& iCurMin)
+{
+    if (vecPermutations.size() == vecCoords.size())
+    {
+        for (int i = 0; i < vecPermutations.size(); i++)
+        {
+            RotateArray(vecArray, vecPermutations[i]);
+        }
+        iCurMin = min(iCurMin, CalMinValue(vecArray));
+        return;
+    }
+
+    for (int i = 0; i < vecCoords.size(); i++)
+    {
+        if (bVisited[i])
+            continue;
+
+        bVisited[i] = true;
+        vecPermutations.push_back({ vecCoords[i] });
+        GeneratePermutations(vecArray, vecCoords, vecPermutations, bVisited, iCurMin);
+        vecPermutations.pop_back();
+        bVisited[i] = false;
+    }
+}
+
+int ReturnMinValue(const vector<vector<int>>& vecArray, const vector<pair<ROWCOL, ROWCOL>>& vecCoords)
+{
+    vector<vector<int>> vecCopy = vecArray;
+    vector<pair<ROWCOL, ROWCOL>> vecPermutations;
+    vector<bool> bVisited(vecCoords.size(), false);
+
+    int iMinAns = MAX_INT;
+    GeneratePermutations(vecCopy, vecCoords, vecPermutations, bVisited, iMinAns);
+    return iMinAns;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int N, M, K;
+    cin >> N >> M >> K;
+
+    vector<vector<int>> vecArray(N, vector<int>(M));
+    {
+        for (int iRow = 0; iRow < N; iRow++)
+        {
+            for (int iCol = 0; iCol < M; iCol++)
+            {
+                cin >> vecArray[iRow][iCol];
+            }
+        }
+    }
+    
+    vector<pair<ROWCOL, ROWCOL>> vecCoords(K);
+    {
+        for (int i = 0; i < K; i++)
+        {
+            int iRow, iCol, iSize;
+            cin >> iRow >> iCol >> iSize;
+
+            vecCoords[i].first = ROWCOL{ iRow - iSize - 1, iCol - iSize - 1};
+            vecCoords[i].second = ROWCOL{ iRow + iSize - 1, iCol + iSize - 1 };
+        }
+    }
+
+    cout << ReturnMinValue(vecArray, vecCoords); 
+
+    return 0;
+}
