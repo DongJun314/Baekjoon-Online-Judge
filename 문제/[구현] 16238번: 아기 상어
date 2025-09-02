@@ -1,0 +1,140 @@
+** 핵심 **
+1. 복잡함을 세분화해, 간단화 시키자
+2. 재귀는 스택오버플로우가 날 위험성이 있어, 주의하며 사용하기
+
+================================================================
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+struct ROWCOL 
+{
+    int row, col;
+};
+
+// BFS로 모든 먹을 수 있는 물고기까지 거리 계산
+vector<pair<int, ROWCOL>> GetEdibleFishes(const vector<vector<int>>& ocean, const ROWCOL& sharkPos, int sharkSize)
+{
+    vector<pair<int, ROWCOL>> edible; // 거리, 좌표
+
+    int n = ocean.size();
+    vector<vector<bool>> visited(n, vector<bool>(n, false));
+    queue<pair<ROWCOL, int>> q;
+    q.push({ sharkPos, 0 });
+    visited[sharkPos.row][sharkPos.col] = true;
+
+    int dRow[4] = { -1, 0, 0, 1 };
+    int dCol[4] = { 0, -1, 1, 0 };
+
+    while (!q.empty()) 
+    {
+        pair<ROWCOL, int> frontElem = q.front();
+        ROWCOL cur = frontElem.first;
+        int dist = frontElem.second;
+        q.pop();
+
+        for (int dir = 0; dir < 4; dir++) 
+        {
+            int nr = cur.row + dRow[dir];
+            int nc = cur.col + dCol[dir];
+
+            if (nr < 0 || nr >= n || nc < 0 || nc >= n) 
+                continue;
+
+            if (visited[nr][nc]) 
+                continue;
+
+            if (ocean[nr][nc] > sharkSize) 
+                continue;
+
+            visited[nr][nc] = true;
+
+            // 먹을 수 있는 물고기
+            if (ocean[nr][nc] > 0 && ocean[nr][nc] < sharkSize) 
+            {
+                edible.push_back({ dist + 1, ROWCOL{nr, nc} });
+            }
+
+            q.push({ ROWCOL{nr, nc }, dist + 1 });
+        }
+    }
+
+    return edible;
+}
+
+int SimulateBabyShark(vector<vector<int>>& ocean, ROWCOL sharkPos)
+{
+    int n = ocean.size();
+    int timeSpent = 0;
+    int sharkSize = 2;
+    int eaten = 0;
+
+    while (true) 
+    {
+        vector<pair<int, ROWCOL>> fishes = GetEdibleFishes(ocean, sharkPos, sharkSize);
+
+        if (fishes.empty()) 
+            break;
+
+        // 최우선 먹을 물고기 선택 (거리, row, col)
+        sort(fishes.begin(), fishes.end(), [](const pair<int, ROWCOL>& a, const pair<int, ROWCOL>& b) {
+            // 거리
+            if (a.first != b.first) 
+                return a.first < b.first;  
+            // 위쪽
+            if (a.second.row != b.second.row) 
+                return a.second.row < b.second.row; 
+            // 왼쪽
+            return a.second.col < b.second.col;                       
+            });
+
+        pair<int, ROWCOL> fishElem = fishes[0];
+        int dist = fishElem.first;
+        ROWCOL fishPos = fishElem.second;
+
+        timeSpent += dist;
+        eaten++;
+
+        // 상어 이동 & 물고기 제거
+        ocean[fishPos.row][fishPos.col] = 0;
+        sharkPos = fishPos;
+
+        if (eaten == sharkSize) 
+        {
+            sharkSize++;
+            eaten = 0;
+        }
+    }
+
+    return timeSpent;
+}
+
+int main() 
+{
+    ios::sync_with_stdio(false); 
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int n;
+    cin >> n;
+    vector<vector<int>> ocean(n, vector<int>(n));
+    ROWCOL sharkPos = { 0,0 };
+
+    for (int i = 0; i < n; i++) 
+    {
+        for (int j = 0; j < n; j++) 
+        {
+            cin >> ocean[i][j];
+            if (ocean[i][j] == 9) 
+            {
+                sharkPos = ROWCOL{ i, j };
+                ocean[sharkPos.row][sharkPos.col] = 0;
+            }
+        }
+    }
+
+    cout << SimulateBabyShark(ocean, sharkPos) << "\n";
+    return 0;
+}
