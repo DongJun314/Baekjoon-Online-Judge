@@ -1,0 +1,86 @@
+** 핵심 **
+1. 무언가를 만들기 보다는, 기존에 있는 자료를 가지고 최대한 변형없이 구현하기
+2. 그래야 오류 확률도 줄고, 잡을 
+
+====================================================================
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct Fish {
+    int num, dir;
+    bool alive;
+};
+
+int dRow[8] = { -1,-1,0,1,1,1,0,-1 };
+int dCol[8] = { 0,-1,-1,-1,0,1,1,1 };
+
+int answer = 0;
+
+void moveFishes(vector<vector<Fish>>& ocean, int sharkRow, int sharkCol) {
+    for (int n = 1; n <= 16; n++) {
+        int row=-1,col=-1;
+        // 해당 번호 물고기 위치 찾기
+        for (int r=0;r<4;r++) for (int c=0;c<4;c++) {
+            if (ocean[r][c].num==n && ocean[r][c].alive) { row=r; col=c; }
+        }
+        if (row==-1) continue;
+
+        int dir = ocean[row][col].dir;
+        for (int k=0;k<8;k++) {
+            int ndir = (dir+k)%8;
+            int nr=row+dRow[ndir], nc=col+dCol[ndir];
+            if (nr<0||nr>=4||nc<0||nc>=4) continue;
+            if (nr==sharkRow && nc==sharkCol) continue;
+
+            swap(ocean[row][col], ocean[nr][nc]);
+            ocean[nr][nc].dir=ndir;
+            break;
+        }
+    }
+}
+
+void dfs(vector<vector<Fish>> ocean, int sharkRow, int sharkCol, int sharkDir, int sum) {
+    answer = max(answer,sum);
+
+    // 물고기 이동
+    moveFishes(ocean, sharkRow, sharkCol);
+
+    // 상어 이동
+    for (int step=1;step<=3;step++) {
+        int nr = sharkRow + dRow[sharkDir]*step;
+        int nc = sharkCol + dCol[sharkDir]*step;
+        if (nr<0||nr>=4||nc<0||nc>=4) break;
+        if (!ocean[nr][nc].alive) continue;
+
+        vector<vector<Fish>> nextOcean = ocean;
+        int fishNum = nextOcean[nr][nc].num;
+        int nextDir = nextOcean[nr][nc].dir;
+
+        nextOcean[nr][nc].alive=false; // 먹힘
+        dfs(nextOcean,nr,nc,nextDir,sum+fishNum);
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    vector<vector<Fish>> ocean(4, vector<Fish>(4));
+    for (int r=0;r<4;r++) {
+        for (int c=0;c<4;c++) {
+            int a,b; cin>>a>>b;
+            ocean[r][c]={a,b-1,true};
+        }
+    }
+
+    int startNum=ocean[0][0].num;
+    int startDir=ocean[0][0].dir;
+    ocean[0][0].alive=false;
+
+    dfs(ocean,0,0,startDir,startNum);
+
+    cout<<answer<<"\n";
+}
