@@ -1,0 +1,84 @@
+** 핵심 **
+1. deque를 활용한 문제
+
+==============================================================
+
+#include <iostream>
+#include <vector>
+#include <deque>
+using namespace std;
+
+int FindDocPrintSequence(deque<pair<bool, int>>& dq, const int& iTarget)
+{
+    // save the print sequence 
+    deque<pair<bool, int>> printSequence;
+    while (!dq.empty())
+    {
+        int iCurDoc = 0;
+        bool bHasImportantDoc = false;
+        for (int iNextDoc = iCurDoc + 1; iNextDoc < dq.size(); ++iNextDoc)
+        {
+            if (dq[iCurDoc].second < dq[iNextDoc].second)
+            {
+                bHasImportantDoc = true;
+                break;
+            }
+        }
+
+        pair<bool, int> prCurDoc = dq.front();
+        dq.pop_front();
+
+        if (bHasImportantDoc)
+        {
+            dq.push_back(prCurDoc);
+        }
+        else
+        {
+            printSequence.push_back(prCurDoc);
+        }
+    }
+
+    int iPrintSequence = 0;
+    for (int i = 0; i < printSequence.size(); i++)
+    {
+        if (printSequence[i].first)
+        {
+            iPrintSequence += i + 1;
+            break;
+        }
+    }
+
+    return iPrintSequence;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+    
+    int iTestCase;
+    cin >> iTestCase;
+
+    for (int iCase = 0; iCase < iTestCase; ++iCase)
+    {
+        int iN, iM;
+        cin >> iN >> iM;
+
+        deque<pair<bool, int>> dq;
+        for (int iCurNum = 0; iCurNum < iN; ++iCurNum)
+        {   
+            int iDoc;
+            cin >> iDoc;
+
+            pair<bool, int> prDoc = { false, iDoc };
+            if (iCurNum == iM)
+                prDoc.first = true;
+            dq.push_back(prDoc);
+        }
+
+        cout << FindDocPrintSequence(dq, iM) << '\n';
+    }
+ 
+
+    return 0;
+}
