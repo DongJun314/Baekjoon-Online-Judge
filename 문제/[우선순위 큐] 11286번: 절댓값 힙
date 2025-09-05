@@ -1,0 +1,55 @@
+** 핵심 **
+1. 사용자 정의 비교함수에 true false가 가지는 의미를 잘 생각해야한다.
+
+================================================================
+
+#include <iostream>
+#include <queue>
+using namespace std;
+
+struct cmp
+{
+    bool operator()(int a, int b) const {
+        // true == a 가 b 보다 우선순위가 낮다 
+        // false == a 가 b 보다 우선순위가 높다
+        if (abs(a) != abs(b))
+            return abs(a) > abs(b);
+        return a > b;
+    }
+};
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+    
+    int iN;
+    cin >> iN;
+
+    priority_queue<int, vector<int>, cmp> pq;
+
+    for (int i = 0; i < iN; i++)
+    {
+        int iX;
+        cin >> iX;
+
+        if (0 != iX)
+        {
+            pq.push(iX);
+        }
+        else
+        {
+            if (!pq.empty())
+            {
+                cout << pq.top() << '\n';
+                pq.pop();
+            }
+            else
+            {
+                cout << 0 << '\n';
+            }
+        }
+    }
+
+    return 0;
+}
