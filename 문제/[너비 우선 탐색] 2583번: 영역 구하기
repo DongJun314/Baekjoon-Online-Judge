@@ -1,0 +1,104 @@
+** 핵심 **
+1. 너비 우선 탐색 시, 큐에 넣을 때 방문 처리를 하는 것이 안전하다.
+2. 그렇게 하지 않으면, 동일 위치가 큐에 여러 번 들어갈 수 있다.
+
+=========================================================
+
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+int dRow[4] = { -1,0, 1, 0 };
+int dCol[4] = { 0, -1, 0, 1 };
+
+int BFS(vector<vector<bool>>& vecBoard, int& startRow, int& startCol)
+{
+    const int rowSize = vecBoard.size();
+    const int colSize = vecBoard[0].size();
+
+    queue<pair<int, int>> qBFS;
+    qBFS.push({ startRow, startCol });
+    vecBoard[startRow][startCol] = true;
+    
+    int iSize = 0;
+    while (!qBFS.empty())
+    {
+        pair<int, int> curPos = qBFS.front();
+        qBFS.pop();
+
+        int curRow = curPos.first;  
+        int curCol = curPos.second;
+        ++iSize;
+
+        for (int dir = 0; dir < 4; dir++)
+        {
+            int nextRow = curRow + dRow[dir];
+            int nextCol = curCol + dCol[dir];
+        
+            if (0 > nextRow || rowSize <= nextRow)
+                continue;
+        
+            if (0 > nextCol || colSize <= nextCol)
+                continue;
+        
+            if (vecBoard[nextRow][nextCol])
+                continue;
+
+            qBFS.push({ nextRow, nextCol });
+            vecBoard[nextRow][nextCol] = true;
+        }
+    }
+    return iSize;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+    
+    int iRow, iCol, iK;
+    cin >> iRow >> iCol >> iK;
+
+    vector<vector<bool>> vecBoard(iRow, vector<bool>(iCol, false));
+
+    // Bottom Left, Top Right
+    for (int i = 0; i < iK; i++)
+    {
+        int iX1, iY1, iX2, iY2;
+        cin >> iX1 >> iY1 >> iX2 >> iY2;
+
+        for (int row = iY1; row < iY2; row++)
+        {
+            for (int col = iX1; col < iX2; col++)
+            {
+                vecBoard[row][col] = true;
+            }
+        }
+    }
+
+    int iTotalCnt = 0;
+    vector<int> vecAns;
+    for (int row = 0; row < iRow; row++)
+    {
+        for (int col = 0; col < iCol; col++)
+        {
+            if (false == vecBoard[row][col])
+            {
+                ++iTotalCnt;
+                int size = BFS(vecBoard, row, col);
+                vecAns.push_back(size);
+            }
+        }
+    }
+
+    cout << iTotalCnt << '\n';
+
+    sort(vecAns.begin(), vecAns.end());
+    for (int i = 0; i < vecAns.size(); i++)
+    {
+        cout << vecAns[i] << ' ';
+    }
+
+    return 0;
+}
