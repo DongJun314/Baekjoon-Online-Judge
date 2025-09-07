@@ -1,0 +1,80 @@
+*** 핵심 ***
+1. 타이클 탐색 수행 방향에 대해서
+2. DFS -> 사이클 발견 -> 사이클 체크
+
+--------------------------------------
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void FindCircle(const vector<int>& StuList, vector<int>& StuStateList, vector<bool>& vecCircle, int CurStu)
+{
+    int TargetStu = StuList[CurStu];
+    StuStateList[CurStu] = 1;
+
+    if (0 == StuStateList[TargetStu])
+    {
+        FindCircle(StuList, StuStateList, vecCircle, TargetStu);
+    }
+    else if (1 == StuStateList[TargetStu])
+    {
+        CurStu; // TargetStu
+
+        int iTemp = TargetStu;
+        while (true)
+        {
+            vecCircle[iTemp] = true;
+
+            if (iTemp == CurStu)
+                break;
+
+            iTemp = StuList[iTemp];
+        }
+    }
+
+    // why
+    StuStateList[CurStu] = 2;
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int iTestCase;
+    cin >> iTestCase;
+
+    for (int i = 0; i < iTestCase; i++)
+    {
+        int iNumStu;
+        cin >> iNumStu;
+
+        vector<int> StuList(iNumStu + 1, 0);
+        vector<int> StuStateList(iNumStu + 1, 0);
+        vector<bool> vecCircle(iNumStu + 1, false);
+
+        for (int i = 1; i <= iNumStu; i++)
+        {
+            cin >> StuList[i];
+        }
+
+        for (int i = 1; i <= iNumStu; i++)
+        {
+            if(0 == StuStateList[i])
+                FindCircle(StuList, StuStateList, vecCircle, i);
+        }
+
+        int iAns = 0;
+        for (int i = 1; i <= iNumStu; i++)
+        {
+            if (false == vecCircle[i])
+            {
+                ++iAns;
+            }
+        }
+        cout << iAns << '\n';
+    }
+
+    return 0;
+}
