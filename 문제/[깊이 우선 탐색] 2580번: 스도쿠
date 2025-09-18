@@ -1,0 +1,126 @@
+** 핵심 **
+1. 가지치기로 인한 시간 단축
+2. DFS를 bool로 반환하면서 단축하기
+
+================================================================
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<vector<int>> vecSudoku;
+vector<pair<int, int>> vecFillablePos;
+
+vector<int> GetFillableNum(const pair<int, int>& prCurPos)
+{
+    int iCurRow = prCurPos.first;
+    int iCurCol = prCurPos.second;
+    vector<bool> vecVisited(9, false);
+ 
+    // 행
+    for (int iCol = 0; iCol < 9; iCol++)
+    {
+        int iNum = vecSudoku[iCurRow][iCol];
+        if (0 != iNum)
+            vecVisited[iNum - 1] = true;
+    }
+
+    // 열
+    for (int iRow = 0; iRow < 9; iRow++)
+    {
+        int iNum = vecSudoku[iRow][iCurCol];
+        if (0 != iNum)
+            vecVisited[iNum - 1] = true;
+    }
+
+    // 그 네모구역
+
+    int iStartRow{ 0 }, iStartCol{ 0 };
+
+    if (iCurRow < 3)
+        iStartRow = 0;
+    else if (iCurRow >= 3 && iCurRow < 6)
+        iStartRow = 3;
+    else
+        iStartRow = 6;
+
+    if (iCurCol < 3)
+        iStartCol = 0;
+    else if (iCurCol >= 3 && iCurCol < 6)
+        iStartCol = 3;
+    else
+        iStartCol = 6;
+
+    for (int iRow = iStartRow; iRow < iStartRow + 3; iRow++)
+    {
+        for (int iCol = iStartCol; iCol < iStartCol + 3; iCol++)
+        {
+            int iNum = vecSudoku[iRow][iCol];
+            if (0 != iNum)
+                vecVisited[iNum - 1] = true;
+        }
+    }
+
+    vector<int> vecFillableNum;
+    for (int i = 0; i < (int)vecVisited.size(); i++)
+    {
+        if (false == vecVisited[i])
+            vecFillableNum.push_back(i + 1);
+    }
+    return vecFillableNum;
+}
+
+bool FillSudoku(int _iCurIndex)
+{
+    if (_iCurIndex == (int)vecFillablePos.size())
+    {
+        for (int iRow = 0; iRow < 9; iRow++)
+        {
+            for (int iCol = 0; iCol < 9; iCol++)
+            {
+                cout << vecSudoku[iRow][iCol] << ' ';
+            }
+            cout << '\n';
+        }
+        return true;
+    }
+
+    pair<int, int> prCurPos = vecFillablePos[_iCurIndex];
+    vector<int> vecNums = GetFillableNum(prCurPos);
+
+    if (vecNums.empty())
+        return false;
+
+    for (int iCurNum = 0; iCurNum < (int)vecNums.size(); iCurNum++)
+    {
+        vecSudoku[prCurPos.first][prCurPos.second] = vecNums[iCurNum];
+        if (FillSudoku(_iCurIndex + 1))
+            return true;
+        vecSudoku[prCurPos.first][prCurPos.second] = 0;
+    }
+    return false;
+}
+
+int main() 
+{
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    vecSudoku.resize(9, vector<int>(9, 0));
+    for (int iRow = 0; iRow < 9; iRow++)
+    {
+        for (int iCol = 0; iCol < 9; iCol++)
+        {
+            cin >> vecSudoku[iRow][iCol];
+
+            if (0 == vecSudoku[iRow][iCol])
+            {
+                vecFillablePos.push_back({ iRow, iCol });
+            }
+        }
+    }
+
+    FillSudoku(0);
+
+    return 0;
+}
