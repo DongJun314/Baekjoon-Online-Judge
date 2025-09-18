@@ -1,0 +1,154 @@
+** 핵심 **
+1. 이 문제에 핵심은 기운쪽으로 계속 굴러간다는 것이다.
+2. 또한 4차원 배열로 방문 처리를 해주느ㅡㄴ 것이다.
+
+====================================================================
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+struct RBPOSES
+{
+    int iRowRed{ 0 }, iColRed{ 0 };
+    int iRowBlue{ 0 }, iColBlue{ 0 };
+    int iMoveCnt{ 0 };
+};
+
+int iRowSize{ 0 }, iColSize{ 0 };
+
+RBPOSES tPoses;
+vector<vector<char>> vecBoard;
+bool bVisited[11][11][11][11]{ false };
+
+int dRow[4] = { 0, 0, -1, 1 }; // 왼, 오, 위, 아래
+int dCol[4] = { -1, 1, 0, 0 };
+
+int iMinAns = 20;
+
+struct ROLLRES
+{
+    int iRow{ 0 }, iCol{ 0 };
+    int iDist{ 0 };
+    bool bInExit{ false };
+};
+
+// 한 방향으로 끝까지 굴리기
+ROLLRES Roll(const int& _iRow, const int& _iCol, const int& _iDir)
+{
+    int r = _iRow, c = _iCol;
+    int dist = 0;
+    while (true)
+    {
+        int nr = r + dRow[_iDir];
+        int nc = c + dCol[_iDir];
+        char cell = vecBoard[nr][nc];
+        if ('#' == cell) 
+            break;          // 벽이면 멈춤
+        
+        if ('O' == cell)                 // 구멍이면 빠지고 종료
+        {
+            r = nr; c = nc; ++dist;
+            return { r, c, dist, true };
+        }
+        r = nr; c = nc; ++dist;          // 계속 굴러감
+    }
+    return { r, c, dist, false };
+}
+
+void BFS()
+{
+    queue<RBPOSES> qBFS;
+    qBFS.push(tPoses);
+    bVisited[tPoses.iRowRed][tPoses.iColRed][tPoses.iRowBlue][tPoses.iColBlue] = true;
+
+    while (!qBFS.empty())
+    {
+        RBPOSES tCur = qBFS.front();
+        qBFS.pop();
+
+        if (tCur.iMoveCnt >= 10) continue; // 다음 한 번 더 기울이면 11이 되므로 확장 중단
+
+        for (int iDir = 0; iDir < 4; ++iDir)
+        {
+            // 각 구슬을 해당 방향으로 '끝까지' 굴림
+            ROLLRES red  = Roll(tCur.iRowRed,  tCur.iColRed,  iDir);
+            ROLLRES blue = Roll(tCur.iRowBlue, tCur.iColBlue, iDir);
+
+            // 블루가 구멍에 빠지면 실패 분기
+            if (blue.bInExit) 
+                continue;
+
+            // 레드만 구멍에 빠지면 성공
+            if (red.bInExit)
+            {
+                iMinAns = tCur.iMoveCnt + 1;
+                return; // BFS라 최소 이동 수 보장
+            }
+
+            int nRR = red.iRow,  nRC = red.iCol;
+            int nBR = blue.iRow, nBC = blue.iCol;
+
+            // 두 구슬이 같은 칸에 멈춘 경우 → 더 많이 움직인 쪽을 한 칸 뒤로
+            if (nRR == nBR && nRC == nBC)
+            {
+                if (red.iDist > blue.iDist)
+                {
+                    nRR -= dRow[iDir];
+                    nRC -= dCol[iDir];
+                }
+                else
+                {
+                    nBR -= dRow[iDir];
+                    nBC -= dCol[iDir];
+                }
+            }
+
+            if (bVisited[nRR][nRC][nBR][nBC]) continue;
+            bVisited[nRR][nRC][nBR][nBC] = true;
+            qBFS.push({ nRR, nRC, nBR, nBC, tCur.iMoveCnt + 1 });
+        }
+    }
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    cin >> iRowSize >> iColSize;
+
+    vecBoard.resize(iRowSize, vector<char>(iColSize));
+
+    for (int iRow = 0; iRow < iRowSize; ++iRow)
+    {
+        for (int iCol = 0; iCol < iColSize; ++iCol)
+        {
+            cin >> vecBoard[iRow][iCol];
+
+            if (vecBoard[iRow][iCol] == 'R')
+            {
+                tPoses.iRowRed = iRow;
+                tPoses.iColRed = iCol;
+                vecBoard[iRow][iCol] = '.'; // 빈칸으로 교체
+            }
+            else if (vecBoard[iRow][iCol] == 'B')
+            {
+                tPoses.iRowBlue = iRow;
+                tPoses.iColBlue = iCol;
+                vecBoard[iRow][iCol] = '.'; // 빈칸으로 교체
+            }
+        }
+    }
+
+    BFS();
+
+    if (iMinAns <= 10) 
+        cout << iMinAns;
+    else               
+        cout << -1;
+
+    return 0;
+}
